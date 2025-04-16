@@ -201,9 +201,10 @@ Data Retrieval
      }
   Data Structure for Each Class
 
-- User
+● User
   
 The User class represents both students and lecturers. It provides essential user details.
+
 
 Data Variables
 {
@@ -215,9 +216,10 @@ Data Variables
 "phone": "integer"
 }
 
-- Student
+● Student
   
 The Student class extends the User class and includes additional student-specific details. 
+
 Data Variables
 {
 "id": "integer",
@@ -241,9 +243,10 @@ Data Variables
 }
 }
 
-- Lecturer
+● Lecturer
   
 The Lecturer class extends the User class and includes additional lecturer-specific details.
+
 Data Variables
 {
 "id": "integer",
@@ -268,18 +271,20 @@ Data Variables
 }
 }
 
-- School
+● School
 
 The School class represents schools in the system.
+
 Data Variables
 {
 "id": "integer",
 "name": "string"
 }
 
-- Department
+● Department
   
 The Department class represents departments within schools.
+
 Data Variables
 {
 "id": "integer",
@@ -290,9 +295,10 @@ Data Variables
 }
 }
 
-- Course
+● Course
   
 The Course class represents courses offered in departments.
+
 Data Variables
 {
 "id": "integer",
@@ -304,9 +310,10 @@ Data Variables
 "code": "string"
 }
 
-- ClassSession
+● ClassSession
   
 The ClassSession class represents an individual session for a course.
+
 Data Variables
 {
 "id": "integer",
@@ -333,9 +340,10 @@ Data Variables
 "qr_code": "string" 
 }
 
-- Attendance
+● Attendance
   
 The Attendance class tracks attendance for a specific class session.
+
 Data Variables
 {
 "id": "integer",
@@ -361,7 +369,7 @@ Data Variables
 "attendance_time": "datetime"
 }
 
-- Summary of Relationships
+● Summary of Relationships
 
 Here's a quick guide to how the models are connected:
 - User Linked to Student or Lecturer.
