@@ -199,5 +199,175 @@ Data Retrieval
        "start_time": "YYYY-MM-DDTHH:MM:SS",
        "end_time": "YYYY-MM-DDTHH:MM:SS"
      }
+  Data Structure for Each Class
+
+User
+The User class represents both students and lecturers. It provides essential user details.
+
+Data Variables
+{
+"id": "integer",
+"user_type": "string",
+"first_name": "string",
+"last_name": "string",
+"email": "string",
+"phone": "integer"
+}
+
+Student
+The Student class extends the User class and includes additional student-specific details. 
+Data Variables
+{
+"id": "integer",
+"user": {
+"id": "integer",
+"user_type": "string",
+"first_name": "string",
+"last_name": "string",
+"email": "string",
+"phone": "integer"
+},
+"matricule_number": "string",  // matrucule is in the format UBaXXYYZZZ where XX is a number from 10 to 24, YYY  are letters from A to Z, and ZZZ is a number from 000 to 999
+
+"school": {
+"id": "integer",
+"name": "string"
+},
+"department": {
+"id": "integer",
+"name": "string"
+}
+}
+
+Lecturer
+The Lecturer class extends the User class and includes additional lecturer-specific details.
+Data Variables
+{
+"id": "integer",
+"user": {
+"id": "integer",
+"user_type": "string",
+"first_name": "string",
+"last_name": "string",
+"email": "string",
+"phone": "integer"
+},
+"matricule_number": "string",  //matrucule is in the format UBaLecXXYZZZZ where XX is a number from 10 to 24, Y is a  letters from A to Z, and ZZZZ is a number from 0000 to 9999
+
+"school": {
+"id": "integer",
+"name": "string"
+}
+"department": 
+{
+"id": "integer",
+"name": "string"
+}
+}
+
+School
+The School class represents schools in the system.
+Data Variables
+{
+"id": "integer",
+"name": "string"
+}
+
+Department
+The Department class represents departments within schools.
+Data Variables
+{
+"id": "integer",
+"name": "string",
+"school": {
+"id": "integer",
+"name": "string"
+}
+}
+
+Course
+The Course class represents courses offered in departments.
+Data Variables
+{
+"id": "integer",
+"name": "string",
+"department": {
+"id": "integer",
+"name": "string"
+},
+"code": "string"
+}
+
+ClassSession
+The ClassSession class represents an individual session for a course.
+Data Variables
+{
+"id": "integer",
+"course": {
+"id": "integer",
+"name": "string",
+"department": {
+"id": "integer",
+"name": "string"
+},
+"code": "string"
+},
+"lecturer": {
+"id": "integer",
+"user": {
+"id": "integer",
+"first_name": "string",
+"last_name": "string"
+},
+"matricule_number": "string"
+},
+"start_time": "datetime",
+"end_time": "datetime",
+"qr_code": "string" 
+}
+
+Attendance
+The Attendance class tracks attendance for a specific class session.
+Data Variables
+{
+"id": "integer",
+"is_present": "boolean",
+"class_session": {
+"id": "integer",
+"start_time": "datetime",
+"end_time": "datetime",
+"course": {
+"id": "integer",
+"name": "string"
+}
+},
+"student": {
+"id": "integer",
+"user": {
+"id": "integer",
+"first_name": "string",
+"last_name": "string"
+},
+"matricule_number": "string"
+},
+"attendance_time": "datetime"
+}
+
+Summary of Relationships
+
+Here's a quick guide to how the models are connected:
+- User Linked to Student or Lecturer.
+- Student Linked to School and Department.
+- Lecturer Linked to multiple Schools and Departments.
+- Course Linked to a Department.
+- ClassSession Linked to a Course and a Lecturer.
+- Attendance Linked to a ClassSession and a Student.
+
+
+
+
+
+
+
      
 
