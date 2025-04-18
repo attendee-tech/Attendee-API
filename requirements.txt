@@ -3,8 +3,6 @@ Django==5.2
 djangorestframework>=3.14.0
 gunicorn>=21.2.0
 django-cors-headers>=0.5
-<<<<<<< HEAD
+
 djangorestframework-simplejwt>=0.5.3
-=======
-djangorestframework-simplejwt>=0.5.3
->>>>>>> 6ad4ed8 (cors added)
+
