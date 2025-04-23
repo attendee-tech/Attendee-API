@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from base.models import User, Student, Lecturer, Schools, Department, ClassSession, Attendance
+from base.models import User, Student, Lecturer, Schools, Department, ClassSession, Attendance, Course
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
@@ -14,6 +14,10 @@ def lecturer_matricule_validator(value):
     if not re.match(pattern, value):
         raise ValidationError('Invalid Matricule format. Please contact admin for a valid matricule number')
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields='__all__'
 class RegisterStudentSerializer(serializers.Serializer):
     first_name=serializers.CharField(max_length=100)
     last_name=serializers.CharField(max_length=100)
@@ -65,10 +69,25 @@ class RegisterLecturerSerializer(serializers.Serializer):
 
     
 
-class ClassSessionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ClassSession
-        fields = '__all__'
+class ClassSessionSerializer(serializers.Serializer):
+    course=serializers.CharField()
+    end_time=serializers.TimeField()
+    latitude=serializers.FloatField()
+    longitude=serializers.FloatField()
+   
+    def validate(self, data):
+        try:
+            
+            course=Course.objects.get(name=data['course'])
+            if course is None:
+                serializers.ValidationError({'error':'course not found'})
+        except Course.DoesNotExist:
+            raise serializers.ValidationError({'error':'course not found'})
+        
+        return data
+        
+    
+    
 
 class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:

@@ -82,9 +82,13 @@ class Course(models.Model):
 class ClassSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    qr_code = models.CharField(max_length=255)
+    start_time = models.TimeField( auto_now_add=True)
+    end_time = models.TimeField()
+    latitude=models.FloatField()
+    longitude=models.FloatField()
+    
+    
+    
     
     
 class Attendance(models.Model):
