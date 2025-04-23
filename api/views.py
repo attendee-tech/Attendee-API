@@ -28,6 +28,7 @@ class StudentRegisterView(APIView):
                     password=serializer.validated_data['password'],
                     user_type='student'
                 )
+                
                 student = Student.objects.create(
                     user=user,
                     school=Schools.objects.get(name=serializer.validated_data['school_name']),
@@ -64,8 +65,7 @@ class LecturerRegisterView(APIView):
                 )
                 lecturer = Lecturer.objects.create(
                     user=user,
-                    school=Schools.objects.get(name=serializer.validated_data['school_name']),
-                    department=Department.objects.get(name=serializer.validated_data['department_name']),
+                    
                     matricule_number=serializer.validated_data['matricule_number'],
                 )
                 refresh = RefreshToken.for_user(user)

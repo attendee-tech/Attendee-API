@@ -63,8 +63,6 @@ class Student(models.Model):
 class Lecturer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'user_type':'lecturer'})
     matricule_number=models.CharField(blank=False, unique=True, validators=[lecturer_matricule_validator], max_length=13)
-    school=models.ManyToManyField(Schools )
-    department=models.ManyToManyField(Department)
     
     
     def __str__(self):

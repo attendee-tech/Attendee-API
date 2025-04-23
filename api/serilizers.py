@@ -40,19 +40,21 @@ class RegisterStudentSerializer(serializers.Serializer):
             if department.school != school:
                 raise serializers.ValidationError({'error':'Department does not belong to selected school'})
         except Schools.DoesNotExist:
-                raise serializers.ValidationError({'error':'School found'})
+                raise serializers.ValidationError({'error':'School not found'})
         except Department.DoesNotExist:
-                raise serializers.ValidationError({'error':'Department ot found'})
+                raise serializers.ValidationError({'error':'Department not found'})
         
         return data
 
 class RegisterLecturerSerializer(serializers.Serializer):
+    first_name=serializers.CharField(max_length=100)
+    last_name=serializers.CharField(max_length=100)
     username = serializers.CharField(max_length=255)
     email = serializers.EmailField()
+    phone=serializers.IntegerField()
     password = serializers.CharField(max_length=255, write_only=True)
-    school_name= serializers.IntegerField()
-    department_name= serializers.IntegerField()
-    matricule_number = serializers.CharField(max_length=255, validators=[student_matricule_validator])
+    
+    matricule_number = serializers.CharField(max_length=255, validators=[lecturer_matricule_validator])
 
     def validate_password(self, value):
         try:
@@ -61,18 +63,7 @@ class RegisterLecturerSerializer(serializers.Serializer):
             raise serializers.ValidationError(e.messages)
         return value
 
-    def validate(self, data):
-        try:
-            school=Schools.objects.get(name=data['school_name'])
-            department=Department.objects.get(name=data['department_name'])
-            if department.school != school:
-                raise serializers.ValidationError({'error':'Department does not belong to selected school'})
-        except Schools.DoesNotExist:
-                raise serializers.ValidationError({'error':'School found'})
-        except Department.DoesNotExist:
-                raise serializers.ValidationError({'error':'Department ot found'})
-        
-        return data
+    
 
 class ClassSessionSerializer(serializers.ModelSerializer):
     class Meta:
