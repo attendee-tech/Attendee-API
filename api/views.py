@@ -373,16 +373,20 @@ class UserActivityHistoryView(APIView):
 
 # View to return all students of a department course with the number of times they have been present
 class CourseAttendanceSummaryView(APIView):
-    
     permission_classes=[IsAuthenticated]
+    
     def get(self, request, pk):
         try:
             course = Course.objects.get(id=pk)
             students = Student.objects.filter(department=course.department)
             attendance_summary = []
             for student in students:
-                attendance_count = Attendance.objects.filter(
+                attendance_present= Attendance.objects.filter(
                     class_session__course=course, student=student, is_present=True
+                ).count()
+                total_absent= students.count()-attendance_present
+                total_present=Attendance.objects.filter(
+                    class_session__course=course,  is_present=True
                 ).count()
                 attendance_summary.append({
                     "student": {
@@ -390,9 +394,9 @@ class CourseAttendanceSummaryView(APIView):
                         "name": f"{student.user.first_name} {student.user.last_name}",
                         "matricule_number": student.matricule_number,
                     },
-                    "attendance_count": attendance_count,
+                    "attendance_count": attendance_present,
                 })
-            return Response({"course": course.name, "attendance_summary": attendance_summary}, status=status.HTTP_200_OK)
+            return Response({"course": course.name, 'department':course.department.name,'total_present':total_present, 'total_absent':total_absent, "attendance_summary": attendance_summary}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response({"error": "Course or students not found"}, status=status.HTTP_404_NOT_FOUND)
 
