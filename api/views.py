@@ -167,6 +167,7 @@ class LecturerClassSessionView(APIView):
             try:
                 class_session = ClassSession.objects.create(
                     course=Course.objects.get(name=serializer.validated_data["course"]),
+                    
                     end_time=serializer.validated_data["end_time"],
                     start_time=serializer.validated_data["end_time"],
                     latitude=serializer.validated_data["latitude"],

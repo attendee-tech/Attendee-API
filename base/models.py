@@ -89,7 +89,7 @@ class ClassSession(models.Model):
     level=models.IntegerField()
     
     def __str__(self):
-        return self.level + ' ' + self.course.name + ' - ' + self.course.department.name + ' - ' + self.course.department.school.name
+        return self.course.name + ' - ' + self.course.department.name + ' - ' + self.course.department.school.name
     
     
     
