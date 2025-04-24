@@ -224,7 +224,7 @@ class AttendanceView(APIView):
         try:
             class_session = ClassSession.objects.get(id=pk)
             student = Student.objects.get(user=request.user.id)
-            attendance = Attendance.objects.create(class_session=class_session, student=student)
+            attendance = Attendance.objects.create(class_session=class_session, student=student, is_present=True)
             attendance.save()
             return Response({'message': 'Attendance marked successfully'})
         except ObjectDoesNotExist:
@@ -396,7 +396,7 @@ class CourseAttendanceSummaryView(APIView):
                     },
                     "attendance_count": attendance_present,
                 })
-            return Response({"course": course.name, 'department':course.department.name,'total_present':total_present, 'total_absent':total_absent, "attendance_summary": attendance_summary}, status=status.HTTP_200_OK)
+            return Response({"course": course.name + ' ' + course.code, 'department':course.department.name,'total_present':total_present, 'total_absent':total_absent, "attendance_summary": attendance_summary}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response({"error": "Course or students not found"}, status=status.HTTP_404_NOT_FOUND)
 

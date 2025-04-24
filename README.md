@@ -97,8 +97,7 @@ Attendee uses Jason web tokens for user authentication and also store refreshmen
        "last_name": "string",
        "email": "string",
        "password": "string",
-       "school_ids": ["int", "int"],
-       "department_ids": ["int", "int"],
+       
        "matricule_number": "string"
      }
      
@@ -152,7 +151,9 @@ Class Sessions
    - Request Body:
      json
      {
-       "student_ids": ["int", "int"]
+       'is_present':[Boolean],
+       'student_id':[request.user.id],
+       'course_id:pk
      }
      
 Data Retrieval
@@ -199,6 +200,30 @@ Data Retrieval
        "start_time": "YYYY-MM-DDTHH:MM:SS",
        "end_time": "YYYY-MM-DDTHH:MM:SS"
      }
+  Data Structure for Each Class
+7. get student attendance and total attendance of a course
+  - Endpoint: /course/attendance-summary/<int:pk>/
+   - Method: GET
+   - Description:gets the total count of absentees and presents of s course and return all the students with thier attendance status and count of that course
+   - Path Parameters:pk- Class session ID.
+   
+
+8 User activity history (students and lecturers)
+    -Endpoint : /user/activity-history/'
+    - Method: GET
+   - Description:gets user history past activities like attendance and class session creating
+
+
+9 Lecturer access to past class session attendance
+    -Endpoint : /lecturer/past-attendance/<int:pk>/
+    - Method: GET
+   - Description:gets the past class sessions and attendance for a lucturer 
+   - Path Parameters:pk- Class session ID.
+
+10.Get user Details
+   -Endpoint: /user/
+
+     
   Data Structure for Each Class
 
 ● User
