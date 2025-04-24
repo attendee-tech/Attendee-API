@@ -176,6 +176,7 @@ class LecturerClassSessionView(APIView):
                     lecturer=Lecturer.objects.get(user=request.user.id),
                     
                 )
+                class_session.save()
                 return Response(
                     {"message": "Class session created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED,
