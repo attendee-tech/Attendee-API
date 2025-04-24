@@ -14,14 +14,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
 
-class LecturerOnlyView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        if request.user.user_type != "lecturer":
-            return Response({"error": "Access restricted to lecturers only"}, status=status.HTTP_403_FORBIDDEN)
-        return Response({"message": "Welcome, Lecturer!"}, status=status.HTTP_200_OK)
 
 
 # Helper function for generating JWT tokens
@@ -127,21 +122,21 @@ class ProtectedRoute(APIView):
 
 # Get all class sessions for a student
 class StudentClassSessionView(APIView):
-    permission_classes = [IsAuthenticated]
-
+    
+    permission_classes=[IsAuthenticated]
     def get(self, request, pk):
         try:
             student = Student.objects.get(id=pk)
             class_sessions = ClassSession.objects.filter(course__department=student.department)
             serializer = ClassSessionSerializer(class_sessions, many=True)
-            return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+            return Response({'student':student.user.first_name + ' ' + student.user.last_name,'school':student.school.name, 'department':student.department.name ,'sessions':[ {"data": serializer.data}]}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 # Get all students in a department of a school
 class GetDepartmentStudents(APIView):
-    permission_classes = [IsAuthenticated, LecturerOnlyView]
+    permission_classes = [IsAuthenticated, ]
     
 
     def get(self, request, pks, pkd):
@@ -164,7 +159,7 @@ class GetDepartmentStudents(APIView):
 
 # Create class sessions
 class LecturerClassSessionView(APIView):
-    permission_classes = [IsAuthenticated, LecturerOnlyView]
+    permission_classes=[IsAuthenticated]
 
     def post(self, request):
         serializer = ClassSessionSerializer(data=request.data)
@@ -175,20 +170,21 @@ class LecturerClassSessionView(APIView):
                     end_time=serializer.validated_data["end_time"],
                     latitude=serializer.validated_data["latitude"],
                     longitude=serializer.validated_data["longitude"],
-                    lecturer=Lecturer.objects.get(user=request.user),
+                    lecturer=Lecturer.objects.get(user=request.user.id),
+                    
                 )
                 return Response(
                     {"message": "Class session created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED,
                 )
             except ObjectDoesNotExist:
-                return Response({"error": "Lecturer or course not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error":"Lecturer or course not found" }, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Update class sessions
 class LecturerClassSessionUpdateView(APIView):
-    permission_classes = [IsAuthenticated, LecturerOnlyView]
+    permission_classes = [IsAuthenticated, ]
 
     def get(self, request, pk):
         try:
@@ -227,7 +223,7 @@ class AttendanceView(APIView):
     def post(self, request, pk):
         try:
             class_session = ClassSession.objects.get(id=pk)
-            student = Student.objects.get(user=request.user)
+            student = Student.objects.get(user=request.user.id)
             attendance = Attendance.objects.create(class_session=class_session, student=student)
             attendance.save()
             return Response({'message': 'Attendance marked successfully'})
@@ -236,7 +232,7 @@ class AttendanceView(APIView):
         
 
 class GetStudentsAttendance(APIView):
-    permission_classes = [IsAuthenticated, LecturerOnlyView]
+    permission_classes = [IsAuthenticated, ]
     def get(self, request, pk):
         try:
             class_session = ClassSession.objects.get(id=pk)
@@ -282,7 +278,7 @@ class CourseView(APIView):
 
 
 class GetUserData(APIView):
-    
+    permission_classes=[IsAuthenticated]
     def get(self, request):
         if not request.user.is_authenticated:
             return Response({'error': 'User is not authenticated'}, status=401)
@@ -319,7 +315,7 @@ class LogoutView(APIView):
 
 # Lecturer access to past class session attendance
 class LecturerPastAttendanceView(APIView):
-    permission_classes = [IsAuthenticated, LecturerOnlyView]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -377,8 +373,8 @@ class UserActivityHistoryView(APIView):
 
 # View to return all students of a department course with the number of times they have been present
 class CourseAttendanceSummaryView(APIView):
-    permission_classes = [IsAuthenticated, LecturerOnlyView]
-
+    
+    permission_classes=[IsAuthenticated]
     def get(self, request, pk):
         try:
             course = Course.objects.get(id=pk)

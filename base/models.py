@@ -87,6 +87,8 @@ class ClassSession(models.Model):
     latitude=models.FloatField()
     longitude=models.FloatField()
     
+    def __str__(self):
+        return self.course.name + ' - ' + self.course.department.name + ' - ' + self.course.department.school.name
     
     
     

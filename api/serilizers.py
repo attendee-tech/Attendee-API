@@ -72,6 +72,7 @@ class RegisterLecturerSerializer(serializers.Serializer):
 class ClassSessionSerializer(serializers.Serializer):
     course=serializers.CharField()
     end_time=serializers.TimeField()
+    
     latitude=serializers.FloatField()
     longitude=serializers.FloatField()
    
