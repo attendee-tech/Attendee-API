@@ -82,13 +82,14 @@ class Course(models.Model):
 class ClassSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
-    start_time = models.TimeField( auto_now_add=True)
+    start_time = models.TimeField(auto_now_add=True)
     end_time = models.TimeField()
     latitude=models.FloatField()
     longitude=models.FloatField()
+    level=models.IntegerField()
     
     def __str__(self):
-        return self.course.name + ' - ' + self.course.department.name + ' - ' + self.course.department.school.name
+        return self.level + ' ' + self.course.name + ' - ' + self.course.department.name + ' - ' + self.course.department.school.name
     
     
     
