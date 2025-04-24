@@ -199,7 +199,7 @@ class LecturerClassSessionUpdateView(APIView):
             return Response({'error': 'course or class session does not found'}, status=status.HTTP_404_NOT_FOUND)
         
 class GetClassSession(APIView):
-    permission_classes=[IsAuthenticated]
+    
     def get(self, request, pk):
         try:
            
@@ -212,7 +212,8 @@ class GetClassSession(APIView):
                 'id':class_session.id,
                 'start time':class_session.start_time,
                 'end time':class_session.end_time,
-                'lecturer':class_session.lecturer.user.first_name + ' ' + class_session.lecturer.user.last_name
+                'lecturer':class_session.lecturer.user.first_name + ' ' + class_session.lecturer.user.last_name,
+                'level':class_session.level
             }
             return Response({'data':[context]}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
