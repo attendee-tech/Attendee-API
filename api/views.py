@@ -177,14 +177,19 @@ class LecturerClassSessionView(APIView):
     def post(self, request):
         serializer = ClassSessionSerializer(data=request.data)
         if serializer.is_valid():
+            lecturer_id = request.data.get('lecturer_id')
+
             try:
+                
+               
+                
                 class_session = ClassSession.objects.create(
                     course=Course.objects.get(name=serializer.validated_data["course"]),
                     latitude=serializer.validated_data["latitude"],
                     duration_time=serializer.validated_data['duration_time'],
                     longitude=serializer.validated_data["longitude"],
                     level=serializer.validated_data["level"],
-                    lecturer=request.user.id,
+                    lecturer=User.objects.get(id=lecturer_id),
                     
                 )
                 
@@ -217,8 +222,7 @@ class GetClassSession(APIView):
             context = {
                 'course': class_session.course.name,
                 'id': class_session.id,
-                'start_time': class_session.start_time,
-                'end_time': class_session.end_time,
+                'duration':class_session.duration_time,
                 'lecturer': f"{class_session.lecturer.user.first_name} {class_session.lecturer.user.last_name}",
                 'level': class_session.level,
             }
