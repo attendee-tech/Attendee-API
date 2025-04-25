@@ -173,7 +173,7 @@ class LecturerClassSessionView(APIView):
                     latitude=serializer.validated_data["latitude"],
                     longitude=serializer.validated_data["longitude"],
                     level=serializer.validated_data["level"],
-                    lecturer=request.user,
+                    lecturer=request.user.id,
                     
                 )
                 class_session.save()
@@ -289,7 +289,7 @@ class GetUserData(APIView):
             return Response({'error': 'User is not authenticated'}, status=401)
         
         try:
-            on_user = request.user
+            on_user = request.user.id
             user = User.objects.get(id=on_user)
             
             return Response({
