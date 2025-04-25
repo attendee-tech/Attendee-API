@@ -130,8 +130,8 @@ class StudentClassSessionView(APIView):
             class_sessions = ClassSession.objects.filter(course__department=student.department)
             serializer = ClassSessionSerializer(class_sessions, many=True)
             return Response({'student':student.user.first_name + ' ' + student.user.last_name,'school':student.school.name, 'department':student.department.name ,'sessions':[ {"data": serializer.data}]}, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ObjectDoesNotExist as e:
+            return Response({"error": e}, status=status.HTTP_404_NOT_FOUND)
 
 
 # Get all students in a department of a school
@@ -169,11 +169,11 @@ class LecturerClassSessionView(APIView):
                     course=Course.objects.get(name=serializer.validated_data["course"]),
                     
                     end_time=serializer.validated_data["end_time"],
-                    start_time=serializer.validated_data["end_time"],
+                    start_time=serializer.validated_data["start_time"],
                     latitude=serializer.validated_data["latitude"],
                     longitude=serializer.validated_data["longitude"],
                     level=serializer.validated_data["level"],
-                    lecturer=Lecturer.objects.get(user=request.user.id),
+                    lecturer=Lecturer.objects.get(user=request.user),
                     
                 )
                 class_session.save()
@@ -228,7 +228,7 @@ class AttendanceView(APIView):
     def post(self, request, pk):
         try:
             class_session = ClassSession.objects.get(id=pk)
-            student = Student.objects.get(user=request.user.id)
+            student = Student.objects.get(user=request.user)
             attendance = Attendance.objects.create(class_session=class_session, student=student, is_present=True)
             attendance.save()
             return Response({'message': 'Attendance marked successfully'})
@@ -289,7 +289,7 @@ class GetUserData(APIView):
             return Response({'error': 'User is not authenticated'}, status=401)
         
         try:
-            on_user = request.user.id
+            on_user = request.user
             user = User.objects.get(id=on_user)
             
             return Response({
@@ -340,7 +340,18 @@ class LecturerPastAttendanceView(APIView):
         except ObjectDoesNotExist:
             return Response({"error": "Lecturer or course not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
+class LecturerViewAllClassSessionView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self, request):
+        try:
+            lecturer=Lecturer.objects.get(user=request.user)
+            class_sessions=ClassSession.objects.filter(lecturer=lecturer)
+            serializer=ClassSessionSerializer(class_sessions, many=True)
+ 
+            return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist as e:
+            return Response({'error': e}, status=status.HTTP_404_NOT_FOUND)
+        
 
 
 

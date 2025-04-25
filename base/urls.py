@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView
-from api.views import StudentRegisterView, LecturerRegisterView, LoginView, LogoutView, StudentClassSessionView, LecturerClassSessionView,AttendanceView, SchoolView, DepartmentView, CourseView, GetDepartmentStudents, GetStudentsAttendance, GetClassSession, GetClassSession, LecturerClassSessionUpdateView, GetUserData, ProtectedRoute
+from api.views import StudentRegisterView, LecturerRegisterView, LoginView, LogoutView, StudentClassSessionView, LecturerClassSessionView,AttendanceView, SchoolView, DepartmentView, CourseView, GetDepartmentStudents, GetStudentsAttendance, GetClassSession, GetClassSession, LecturerClassSessionUpdateView, GetUserData, ProtectedRoute, LecturerViewAllClassSessionView
 from django.urls import path
 from api.views import (
     LecturerPastAttendanceView,
@@ -35,6 +35,7 @@ urlpatterns = [
 
     # Course attendance summary
     path('course/attendance-summary/<int:pk>/', CourseAttendanceSummaryView.as_view(), name='course-attendance-summary'),
+    path("lecturer/class-sessions/", LecturerViewAllClassSessionView.as_view(), name="")
 ]
 
 
