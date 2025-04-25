@@ -83,7 +83,7 @@ class Course(models.Model):
     
 class ClassSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    lecturer = models.ForeignKey(User, on_delete=models.CASCADE)
     duration_time = models.IntegerField()
     
     latitude=models.FloatField()
@@ -99,7 +99,7 @@ class ClassSession(models.Model):
 class Attendance(models.Model):
     is_present=models.BooleanField(default=False)
     class_session = models.ForeignKey(ClassSession, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
     attendance_time = models.DateTimeField(auto_now_add=True)
     
     
