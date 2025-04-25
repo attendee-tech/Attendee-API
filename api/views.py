@@ -101,6 +101,10 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
+
+        if not username or not password:
+            return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
         user = authenticate(username=username, password=password)
         if user:
             tokens = generate_tokens(user)
@@ -110,6 +114,8 @@ class LoginView(APIView):
                 status=status.HTTP_200_OK,
             )
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    
 
 
 # Protected route
@@ -121,17 +127,24 @@ class ProtectedRoute(APIView):
 
 
 # Get all class sessions for a student
+# Fixing `StudentClassSessionView`
 class StudentClassSessionView(APIView):
-    
-    permission_classes=[IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, pk):
         try:
             student = Student.objects.get(id=pk)
             class_sessions = ClassSession.objects.filter(course__department=student.department)
             serializer = ClassSessionSerializer(class_sessions, many=True)
-            return Response({'student':student.user.first_name + ' ' + student.user.last_name,'school':student.school.name, 'department':student.department.name ,'sessions':[ {"data": serializer.data}]}, status=status.HTTP_200_OK)
+            return Response({
+                'student': f"{student.user.first_name} {student.user.last_name}",
+                'school': student.school.name,
+                'department': student.department.name,
+                'sessions': [{"data": serializer.data}],
+            }, status=status.HTTP_200_OK)
         except ObjectDoesNotExist as e:
-            return Response({"error": e}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 # Get all students in a department of a school
@@ -198,40 +211,45 @@ class LecturerClassSessionUpdateView(APIView):
             return Response({'error': 'course or class session does not found'}, status=status.HTTP_404_NOT_FOUND)
         
 class GetClassSession(APIView):
-    
     def get(self, request, pk):
         try:
-           
-            class_session=ClassSession.objects.get(id=pk)
-            serializer=ClassSessionSerializer(class_session, many=True)
-          
-                
-            context={
-                'course':class_session.course.name,
-                'id':class_session.id,
-                'start time':class_session.start_time,
-                'end time':class_session.end_time,
-                'lecturer':class_session.lecturer.user.first_name + ' ' + class_session.lecturer.user.last_name,
-                'level':class_session.level
+            class_session = ClassSession.objects.get(id=pk)
+            context = {
+                'course': class_session.course.name,
+                'id': class_session.id,
+                'start_time': class_session.start_time,
+                'end_time': class_session.end_time,
+                'lecturer': f"{class_session.lecturer.user.first_name} {class_session.lecturer.user.last_name}",
+                'level': class_session.level,
             }
-            return Response({'data':[context]}, status=status.HTTP_200_OK)
+            return Response({'data': [context]}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
-            return Response({'error': 'class session does not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Class session not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 #Mark attendance of an ongoing class class session course
+# Fix Attendance marking
 class AttendanceView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         try:
             class_session = ClassSession.objects.get(id=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"error": "Class session not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
             student = Student.objects.get(user=request.user)
-            attendance = Attendance.objects.create(class_session=class_session, student=student, is_present=True)
-            attendance.save()
-            return Response({'message': 'Attendance marked successfully'})
-        except ObjectDoesNotExist:
-            return Response({'error': 'Class session or student not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        attendance, created = Attendance.objects.get_or_create(class_session=class_session, student=student)
+        attendance.is_present = True  # Set attendance to present
+        attendance.save()
+        return Response({'message': 'Attendance marked successfully'})
+
         
 
 class GetStudentsAttendance(APIView):
@@ -309,13 +327,14 @@ class LogoutView(APIView):
 
     def post(self, request):
         try:
-            refresh_token=request.data['refresh']
-            token=RefreshToken(refresh_token)
-            token.blacklist()
+            refresh_token = request.data['refresh']
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # Blacklist the token
             logout(request)
-            return Response({'message':'logged out successfully'}, status=status.HTTP_205_RESET_CONTENT)
+            return Response({'message': 'Logged out successfully'}, status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
-            return Response({'error':e}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Lecturer access to past class session attendance
 class LecturerPastAttendanceView(APIView):
