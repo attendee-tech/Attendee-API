@@ -173,7 +173,7 @@ class LecturerClassSessionView(APIView):
                     latitude=serializer.validated_data["latitude"],
                     longitude=serializer.validated_data["longitude"],
                     level=serializer.validated_data["level"],
-                    lecturer=Lecturer.objects.get(user=request.user),
+                    lecturer=request.user,
                     
                 )
                 class_session.save()
