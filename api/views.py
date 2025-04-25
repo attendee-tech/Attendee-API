@@ -175,34 +175,43 @@ class LecturerClassSessionView(APIView):
     permission_classes=[IsAuthenticated]
 
     def post(self, request):
+        # Initialize the serializer with the incoming data
         serializer = ClassSessionSerializer(data=request.data)
+
+        # Validate the serializer
         if serializer.is_valid():
             lecturer_id = request.data.get('lecturer_id')
             
-
             try:
-                
-               
-                
+                # Attempt to fetch the related Course and User objects
+                course = Course.objects.get(name=serializer.validated_data["course"])
+                lecturer = User.objects.get(id=lecturer_id)
+
+                # Create the new ClassSession object
                 class_session = ClassSession.objects.create(
-                    course=Course.objects.get(name=serializer.validated_data["course"]),
+                    course=course,
                     latitude=serializer.validated_data["latitude"],
-                    duration_time=serializer.validated_data['duration_time'],
                     longitude=serializer.validated_data["longitude"],
+                    duration_time=serializer.validated_data['duration_time'],
                     level=serializer.validated_data["level"],
-                    lecturer=User.objects.get(id=lecturer_id),
-                    
+                    lecturer=lecturer,
                 )
-                
+
+                # Return a success response
                 return Response(
                     {"message": "Class session created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED,
                 )
+
             except ObjectDoesNotExist as e:
-                return Response({"error":e}, status=status.HTTP_404_NOT_FOUND)
+                # Handle case where the Course or User does not exist
+                return Response(
+                    {"error": f"Invalid reference: {str(e)}"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+    # If serializer is not valid, return error details
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 # Update class sessions
 class LecturerClassSessionUpdateView(APIView):
     permission_classes = [IsAuthenticated, ]
