@@ -8,6 +8,7 @@ from .serilizers import (
     AttendanceSerializer,
     GetStudents,
     UserSerializer,
+    LoginSerializer
 )
 from base.models import User, Student, Lecturer, Schools, Department, Course, ClassSession, Attendance
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -95,27 +96,26 @@ class LecturerRegisterView(APIView):
 
 
 # User authentication
+
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = authenticate(username=serializer.validated_data["username"], password=serializer.validated_data["password"])
+            if user:
+                tokens = generate_tokens(user)
+                login(request, user)
+                return Response(
+                    {"message": "Logged in successfully", "tokens": tokens},
+                    status=status.HTTP_200_OK,
+                )
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if not username or not password:
-            return Response({"error": "Username and password are required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user = authenticate(username=username, password=password)
-        if user:
-            tokens = generate_tokens(user)
-            login(request, user)
-            return Response(
-                {"message": "Logged in successfully", "tokens": tokens},
-                status=status.HTTP_200_OK,
-            )
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    
 
 
 # Protected route
@@ -149,7 +149,7 @@ class StudentClassSessionView(APIView):
 
 # Get all students in a department of a school
 class GetDepartmentStudents(APIView):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated]
     
 
     def get(self, request, pks, pkd):
@@ -315,11 +315,10 @@ class CourseView(APIView):
 class GetUserData(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request):
-        if not request.user.is_authenticated:
-            return Response({'error': 'User is not authenticated'}, status=401)
+        
         
         try:
-            on_user = request.user.id
+            on_user = request.user
             user = User.objects.get(id=on_user)
             
             return Response({
@@ -364,7 +363,7 @@ class LecturerPastAttendanceView(APIView):
                 attendance_data.append({
                     "class_session": session.id,
                     "course": session.course.name,
-                    "date": session.start_time,
+                    "date": session.duration_time,
                     "attendance": AttendanceSerializer(attendance, many=True).data,
                 })
             return Response({"data": attendance_data}, status=status.HTTP_200_OK)
@@ -399,7 +398,7 @@ class UserActivityHistoryView(APIView):
                 {
                     "class_session": att.class_session.id,
                     "course": att.class_session.course.name,
-                    "date": att.class_session.start_time,
+                    "date": att.class_session.duration_time,
                     "status": "Present" if att.is_present else "Absent",
                 }
                 for att in attendance
@@ -410,7 +409,7 @@ class UserActivityHistoryView(APIView):
                 {
                     "class_session": session.id,
                     "course": session.course.name,
-                    "date": session.start_time,
+                    "date": session.duration_time,
                 }
                 for session in class_sessions
             ]
