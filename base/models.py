@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser, User
 import datetime
 
+
 # Create your models here.
 
 def student_matricule_validator(value):
@@ -42,8 +43,9 @@ class User(AbstractUser):
     user_type=models.CharField(max_length=10, choices=role_choice)
     first_name=models.CharField(blank=False, max_length=100)
     last_name=models.CharField(blank=False, max_length=100)
-    email=models.EmailField(blank=False, max_length=254)
+    email=models.EmailField(blank=False, unique=True)
     phone=models.IntegerField(default='67000000')
+    username=models.CharField(blank=False, max_length=50, unique=True)
     
     def __str__(self):
         return self.first_name + ' ' + self.last_name 
