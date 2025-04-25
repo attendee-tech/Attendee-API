@@ -82,8 +82,8 @@ class Course(models.Model):
 class ClassSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    duration_time = models.IntegerField()
+    
     latitude=models.FloatField()
     longitude=models.FloatField()
     level=models.IntegerField()
