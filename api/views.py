@@ -178,6 +178,7 @@ class LecturerClassSessionView(APIView):
         serializer = ClassSessionSerializer(data=request.data)
         if serializer.is_valid():
             lecturer_id = request.data.get('lecturer_id')
+            
 
             try:
                 
@@ -197,8 +198,8 @@ class LecturerClassSessionView(APIView):
                     {"message": "Class session created successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED,
                 )
-            except ObjectDoesNotExist:
-                return Response({"error":"Lecturer or course not found" }, status=status.HTTP_404_NOT_FOUND)
+            except ObjectDoesNotExist as e:
+                return Response({"error":e}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
