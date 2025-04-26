@@ -249,13 +249,14 @@ class AttendanceView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
+        student_id = request.data.get('student_id')
         try:
             class_session = ClassSession.objects.get(id=pk)
         except ClassSession.DoesNotExist:
             return Response({"error": "Class session not found"}, status=status.HTTP_404_NOT_FOUND)
         
         try:
-            student = Student.objects.get(user=request.user)
+            student = student_id
         except Student.DoesNotExist:
             return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -318,7 +319,7 @@ class GetUserData(APIView):
         
         
         try:
-            on_user = request.user
+            on_user = request.user.id
             user = User.objects.get(id=on_user)
             
             return Response({
@@ -354,8 +355,9 @@ class LecturerPastAttendanceView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
+        lecturer_id = request.data.get('lecturer_id')
         try:
-            lecturer = Lecturer.objects.get(user=request.user)
+            lecturer = lecturer_id
             class_sessions = ClassSession.objects.filter(lecturer=lecturer, course__id=pk)
             attendance_data = []
             for session in class_sessions:
@@ -373,8 +375,9 @@ class LecturerPastAttendanceView(APIView):
 class LecturerViewAllClassSessionView(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request):
+        lecturer_id = request.data.get('lecturer_id')
         try:
-            lecturer=Lecturer.objects.get(user=request.user)
+            lecturer=lecturer_id
             class_sessions=ClassSession.objects.filter(lecturer=lecturer)
             serializer=ClassSessionSerializer(class_sessions, many=True)
  
@@ -391,7 +394,7 @@ class UserActivityHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
+        user = request.user.id
         if user.user_type == "student":
             attendance = Attendance.objects.filter(student__user=user)
             history = [
