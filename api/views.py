@@ -374,8 +374,8 @@ class LecturerPastAttendanceView(APIView):
 
 class LecturerViewAllClassSessionView(APIView):
     permission_classes=[IsAuthenticated]
-    def get(self, request):
-        lecturer_id = request.data.get('lecturer_id')
+    def get(self, request, pk):
+        lecturer_id = Lecturer.objects.get(id=pk)
         try:
             lecturer=lecturer_id
             class_sessions=ClassSession.objects.filter(lecturer=lecturer)

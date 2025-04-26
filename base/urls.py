@@ -35,7 +35,7 @@ urlpatterns = [
 
     # Course attendance summary
     path('course/attendance-summary/<int:pk>/', CourseAttendanceSummaryView.as_view(), name='course-attendance-summary'),
-    path("lecturer/class-sessions/", LecturerViewAllClassSessionView.as_view(), name="")
+    path("lecturer/class-sessions/<int:pk>", LecturerViewAllClassSessionView.as_view(), name="")
 ]
 
 
