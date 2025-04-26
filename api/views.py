@@ -380,8 +380,10 @@ class LecturerViewAllClassSessionView(APIView):
             lecturer=lecturer_id
             class_sessions=ClassSession.objects.filter(lecturer=lecturer)
             serializer=ClassSessionSerializer(class_sessions, many=True)
- 
-            return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+            if serializer.data:
+                return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+            else:
+                 return Response({'data': 'no class sessions found, are you sure you are lecturer'}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response({'error': 'lecturer not found'}, status=status.HTTP_404_NOT_FOUND)
         
