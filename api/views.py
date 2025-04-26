@@ -375,15 +375,15 @@ class LecturerPastAttendanceView(APIView):
 class LecturerViewAllClassSessionView(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request, pk):
-        lecturer_id = Lecturer.objects.get(id=pk)
+        lecturer_id = User.objects.get(id=pk)
         try:
             lecturer=lecturer_id
             class_sessions=ClassSession.objects.filter(lecturer=lecturer)
             serializer=ClassSessionSerializer(class_sessions, many=True)
  
             return Response({'data': serializer.data}, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist as e:
-            return Response({'error': e}, status=status.HTTP_404_NOT_FOUND)
+        except ObjectDoesNotExist:
+            return Response({'error': 'lecturer not found'}, status=status.HTTP_404_NOT_FOUND)
         
 
 
