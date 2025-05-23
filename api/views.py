@@ -16,7 +16,7 @@ from rest_framework.pagination import PageNumberPagination
 from base.models import User, Student, Lecturer, Schools, Department, Course, ClassSession, Attendance
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import Count, Q, F, FloatField, ExpressionWrapper, Case, When, Sum, Avg
@@ -35,6 +35,22 @@ def generate_tokens(user):
         "access": str(refresh.access_token),
     }
 
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    """Calculate distance between two GPS points in meters using the Haversine formula."""
+    R = 6371000  # Earth radius in meters
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+
+    a = (
+        math.sin(delta_phi / 2) ** 2
+        + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
+    )
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    return R * c  # distance in meters
 
 class SessionProximityCheckView(APIView):
     permission_classes = [IsAuthenticated]
@@ -55,90 +71,158 @@ class SessionProximityCheckView(APIView):
         except ClassSession.DoesNotExist:
             return Response({"error": "Session not found"}, status=404)
 
-        # Lecturer’s location at session creation is the center
-        center_lat = session.latitude
-        center_lon = session.longitude
+        # Use the radius from the session (stored in DB)
+        try:
+            radius = float(session.range_radius)
+            if radius <= 0:
+                raise ValueError()
+        except (TypeError, ValueError):
+            return Response({"error": "Invalid session radius configuration"}, status=500)
 
-        # Approximate conversion: 1 degree ≈ 111,000 meters
-        meters_per_degree = 111000
+        distance = haversine_distance(
+            session.latitude, session.longitude, student_lat, student_lon
+        )
 
-        lat_diff = abs(center_lat - student_lat) * meters_per_degree
-        lon_diff = abs(center_lon - student_lon) * meters_per_degree * math.cos(math.radians(center_lat))
-
-        within_square = lat_diff <= 5 and lon_diff <= 5  # within 10x10 meter square
+        access_granted = distance <= radius
 
         return Response({
-            "access_granted": within_square,
-            "lat_diff_meters": round(lat_diff, 2),
-            "lon_diff_meters": round(lon_diff, 2),
-            "message": "Access granted" if within_square else "Access denied: too far from class location"
+            "access_granted": access_granted,
+            "distance_to_class_meters": round(distance, 2),
+            "allowed_radius_meters": radius,
+            "message": "Access granted" if access_granted else "Access denied: too far from class location"
         })
 
 
-
 # Create a student
+User = get_user_model()
+
 class StudentRegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = RegisterStudentSerializer(data=request.data)
         if serializer.is_valid():
+            username = serializer.validated_data["username"]
+            email = serializer.validated_data["email"]
+            phone = serializer.validated_data["phone"]
+            matricule_number = serializer.validated_data["matricule_number"]
+            device_id = serializer.validated_data.get("device_id")
+
+            if not device_id:
+                return Response({"error": "Device ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if device_id already used
+            if User.objects.filter(device_id=device_id).exists():
+                return Response({"error": "An account from this device already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check for existing unique fields
+            if User.objects.filter(username=username).exists():
+                return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(email=email).exists():
+                return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(phone=phone).exists():
+                return Response({"error": "Phone number already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            if Student.objects.filter(matricule_number=matricule_number).exists():
+                return Response({"error": "Matricule number already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
             try:
                 user = User.objects.create_user(
-                    username=serializer.validated_data["username"],
+                    username=username,
                     first_name=serializer.validated_data["first_name"],
                     last_name=serializer.validated_data["last_name"],
-                    phone=serializer.validated_data["phone"],
-                    email=serializer.validated_data["email"],
+                    phone=phone,
+                    email=email,
                     password=serializer.validated_data["password"],
                     user_type="student",
+                    device_id=device_id,  # save device_id here
                 )
+
+                school = Schools.objects.only("id").get(name=serializer.validated_data["school_name"])
+                department = Department.objects.only("id").get(name=serializer.validated_data["department_name"])
+
                 Student.objects.create(
                     user=user,
-                    school=Schools.objects.get(name=serializer.validated_data["school_name"]),
-                    department=Department.objects.get(name=serializer.validated_data["department_name"]),
-                    matricule_number=serializer.validated_data["matricule_number"],
+                    school=school,
+                    department=department,
+                    matricule_number=matricule_number,
                 )
+
                 tokens = generate_tokens(user)
                 login(request, user)
+
                 return Response(
                     {"message": "Student registered successfully", "tokens": tokens},
                     status=status.HTTP_201_CREATED,
                 )
+
             except ObjectDoesNotExist as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": f"Invalid school or department: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+            except IntegrityError as e:
+                return Response({"error": f"Database error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 # Create a lecturer
+
 class LecturerRegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = RegisterLecturerSerializer(data=request.data)
         if serializer.is_valid():
+            username = serializer.validated_data["username"]
+            email = serializer.validated_data["email"]
+            phone = serializer.validated_data["phone"]
+            matricule_number = serializer.validated_data["matricule_number"]
+            device_id = serializer.validated_data.get("device_id")
+
+            if not device_id:
+                return Response({"error": "Device ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if device_id already used
+            if User.objects.filter(device_id=device_id).exists():
+                return Response({"error": "An account from this device already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check for existing unique fields
+            if User.objects.filter(username=username).exists():
+                return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(email=email).exists():
+                return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(phone=phone).exists():
+                return Response({"error": "Phone number already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            if Lecturer.objects.filter(matricule_number=matricule_number).exists():
+                return Response({"error": "Matricule number already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
             try:
                 user = User.objects.create_user(
-                    username=serializer.validated_data["username"],
+                    username=username,
                     first_name=serializer.validated_data["first_name"],
                     last_name=serializer.validated_data["last_name"],
-                    phone=serializer.validated_data["phone"],
-                    email=serializer.validated_data["email"],
+                    phone=phone,
+                    email=email,
                     password=serializer.validated_data["password"],
                     user_type="lecturer",
+                    device_id=device_id,  # save device_id here
                 )
+
                 Lecturer.objects.create(
                     user=user,
-                    matricule_number=serializer.validated_data["matricule_number"],
+                    matricule_number=matricule_number,
                 )
+
                 tokens = generate_tokens(user)
                 login(request, user)
+
                 return Response(
                     {"message": "Lecturer registered successfully", "tokens": tokens},
                     status=status.HTTP_201_CREATED,
                 )
+
             except ObjectDoesNotExist as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": f"Invalid data: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+            except IntegrityError as e:
+                return Response({"error": f"Database error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -366,6 +450,7 @@ class LecturerClassSessionView(APIView):
                     hall=serializer.validated_data['hall'],
                     latitude=serializer.validated_data['latitude'],
                     longitude=serializer.validated_data['longitude'],
+                    range_radius=serializer.validated_data['range_radius'],
                 )
 
                 return Response(

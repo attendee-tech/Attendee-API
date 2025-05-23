@@ -47,6 +47,8 @@ class User(AbstractUser):
     phone=models.IntegerField(default='67000000')
     username=models.CharField(blank=False, max_length=50, unique=True)
     
+    device_id = models.CharField(max_length=255, unique=True)
+    
     def __str__(self):
         return self.first_name + ' ' + self.last_name 
     
@@ -87,7 +89,8 @@ class ClassSession(models.Model):
     
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
-    
+    range_radius = models.FloatField(help_text="Allowed distance in meters", default=10.0)
+
     latitude=models.FloatField(default=1.0)
     longitude=models.FloatField(default=1.0)
     hall=models.CharField(blank=True, max_length=100)

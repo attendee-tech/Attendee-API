@@ -19,16 +19,16 @@ class UserSerializer(serializers.ModelSerializer):
         model=User
         fields='__all__'
 class RegisterStudentSerializer(serializers.Serializer):
-    first_name=serializers.CharField(max_length=100)
-    last_name=serializers.CharField(max_length=100)
-    phone=serializers.IntegerField()
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    phone = serializers.IntegerField()
     username = serializers.CharField(max_length=255)
     email = serializers.EmailField()
     password = serializers.CharField(max_length=255, write_only=True)
     school_name = serializers.CharField(max_length=255)
     department_name = serializers.CharField(max_length=255)
     matricule_number = serializers.CharField(max_length=255, validators=[student_matricule_validator])
-    
+    device_id = serializers.CharField(max_length=255)
 
     def validate_password(self, value):
         try:
@@ -39,26 +39,28 @@ class RegisterStudentSerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            school=Schools.objects.get(name=data['school_name'])
-            department=Department.objects.get(name=data['department_name'])
-            if department.school != school:
-                raise serializers.ValidationError({'error':'Department does not belong to selected school'})
+            school = Schools.objects.get(name=data['school_name'])
         except Schools.DoesNotExist:
-                raise serializers.ValidationError({'error':'School not found'})
-        except Department.DoesNotExist:
-                raise serializers.ValidationError({'error':'Department not found'})
-        
-        return data
+            raise serializers.ValidationError({'school_name': 'School not found'})
 
+        try:
+            department = Department.objects.get(name=data['department_name'])
+        except Department.DoesNotExist:
+            raise serializers.ValidationError({'department_name': 'Department not found'})
+
+        if department.school != school:
+            raise serializers.ValidationError({'department_name': 'Department does not belong to selected school'})
+
+        return data
 class RegisterLecturerSerializer(serializers.Serializer):
-    first_name=serializers.CharField(max_length=100)
-    last_name=serializers.CharField(max_length=100)
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
     username = serializers.CharField(max_length=255)
     email = serializers.EmailField()
-    phone=serializers.IntegerField()
+    phone = serializers.IntegerField()
     password = serializers.CharField(max_length=255, write_only=True)
-    
     matricule_number = serializers.CharField(max_length=255, validators=[lecturer_matricule_validator])
+    device_id = serializers.CharField(max_length=255)
 
     def validate_password(self, value):
         try:
@@ -67,7 +69,6 @@ class RegisterLecturerSerializer(serializers.Serializer):
             raise serializers.ValidationError(e.messages)
         return value
 
-    
 
 class ClassSessionSerializer(serializers.Serializer):
     course=serializers.CharField()
@@ -76,6 +77,7 @@ class ClassSessionSerializer(serializers.Serializer):
     hall=serializers.CharField()
     latitude=serializers.FloatField()
     longitude=serializers.FloatField()
+    range_radius=serializers.FloatField()
    
     def validate(self, data):
         try:
@@ -116,6 +118,7 @@ class ClassSessionAttendanceSerializer(serializers.Serializer):
     longitude=serializers.FloatField()
     lecturer=serializers.CharField()
     id=serializers.IntegerField()
+    range_radius=serializers.FloatField()
         
 
 
