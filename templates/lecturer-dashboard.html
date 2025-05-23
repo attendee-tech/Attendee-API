@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecturer Dashboard | Attendee</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            color: white;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+        }
+
+        .user-details {
+            text-align: right;
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-role {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f9a8d4 0%, #c084fc 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            padding: 30px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-sessions {
+            background: linear-gradient(135deg, #c4b5fd 0%, #8b5cf6 100%);
+            color: #ffffff;
+        }
+
+        .icon-students {
+            background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);
+            color: #ffffff;
+        }
+
+        .icon-attendance {
+            background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+            color: #ffffff;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 5px;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            text-align: left;
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 9999px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            transition: width 0.5s ease;
+        }
+
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #64748b;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        /* Chart */
+        .chart-container {
+            height: 250px;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 30px;
+            width: 60px;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 8px 8px 0 0;
+            transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: 10px;
+            width: 60px;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Filter */
+        .filter-container {
+            margin-bottom: 24px;
+            background-color: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .filter-select {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background-color: #fff;
+            font-size: 14px;
+            color: #475569;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        /* Status Badge */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Action Links */
+        .action-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .action-link:hover {
+            color: #7c3aed;
+        }
+
+        .action-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: #fff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8fafc;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background-color: #f8fafc;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background-color: #fff;
+            font-size: 14px;
+            color: #475569;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* View Session Modal */
+        .session-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+            background-color: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-group label {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .info-group p {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 15px;
+        }
+
+        .student-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: #fff;
+        }
+
+        .student-list table {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-header svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Attendance Summary */
+        .attendance-summary {
+            margin-bottom: 24px;
+            background-color: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .attendance-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .attendance-percentage {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .attendance-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .session-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    img{
+            height: 50px;
+            width: 50px;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <div class="school-icon">
+                            <img src="{% static 'Attendee logo.jpg'%}" alt="">
+                        </div>
+                    </div>
+                    <h1>Attendee Dashboard</h1>
+                </div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="user-name">Dr. {{request.user.first_name}} {{request.user.last_name}}</div>
+                        <div class="user-role">Welcome Back Prof!</div>
+                    </div>
+                    <div class="user-avatar">SJ</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-sessions">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-title">Total Class Sessions</div>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="total-sessions">{{total_class_session}}</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-students">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-title">Total Students</div>
+                        </div>
+                    </div>
+                    <div class="stat-value">156</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-attendance">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-title">Average Attendance</div>
+                        </div>
+                    </div>
+                    <div class="stat-value">87%</div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="content-grid">
+                <div class="card fade-in" style="animation-delay: 0.3s;">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Class Sessions</h2>
+                        <button class="btn btn-primary" id="add-session-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add New Session
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Attendance</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sessions-table-body">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card fade-in" style="animation-delay: 0.4s;">
+                    <div class="card-header">
+                        <h2 class="card-title">Attendance Overview</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="attendance-chart">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Records -->
+            <div class="card fade-in" style="animation-delay: 0.5s;">
+                <div class="card-header">
+                    <h2 class="card-title">Attendance Records</h2>
+                    <button class="btn btn-success" id="download-pdf-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download PDF
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="filter-container">
+                        <label for="course-filter" class="filter-label">Filter by Course</label>
+                        <select id="course-filter" class="filter-select">
+                            <option value="all">All Courses</option>
+                            <option value="cs101">CS101: Introduction to Programming</option>
+                            <option value="cs202">CS202: Data Structures</option>
+                            <option value="cs305">CS305: Algorithm Design</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Course</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Session Modal -->
+    <div class="modal-backdrop" id="add-session-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Class Session</h3>
+                <button class="modal-close" id="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-session-form">
+                    <div class="form-group">
+                        <label for="course" class="form-label">Course</label>
+                        <select id="course" name="course" class="form-control" required>
+                            <option value="">Select a course</option>
+                            <option value="CS101: Introduction to Programming">CS101: Introduction to Programming
+                            </option>
+                            <option value="CS202: Data Structures">CS202: Data Structures</option>
+                            <option value="CS305: Algorithm Design">CS305: Algorithm Design</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" id="date" name="date" class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start-time" class="form-label">Start Time</label>
+                            <input type="time" id="start-time" name="start-time" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end-time" class="form-label">End Time</label>
+                            <input type="time" id="end-time" name="end-time" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="room" class="form-label">Room</label>
+                        <input type="text" id="room" name="room" class="form-control" placeholder="e.g. Room 101"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expected-students" class="form-label">Expected Number of Students</label>
+                        <input type="number" id="expected-students" name="expected-students" min="1"
+                            class="form-control" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-session-btn">Save Session</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Session Modal -->
+    <div class="modal-backdrop" id="view-session-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="view-session-title">Session Details</h3>
+                <button class="modal-close" id="close-view-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="section-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Session Information
+                </div>
+                <div class="session-info">
+                    <div class="info-group">
+                        <label>Course</label>
+                        <p id="view-course"></p>
+                    </div>
+                    <div class="info-group">
+                        <label>Date</label>
+                        <p id="view-date"></p>
+                    </div>
+                    <div class="info-group">
+                        <label>Time</label>
+                        <p id="view-time"></p>
+                    </div>
+                    <div class="info-group">
+                        <label>Room</label>
+                        <p id="view-room"></p>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Attendance Summary
+                </div>
+                <div class="attendance-summary">
+                    <div class="attendance-header">
+                        <span class="attendance-percentage" id="attendance-percentage">75% (30/40 students)</span>
+                        <span class="attendance-label">Present/Total</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="attendance-progress" style="width: 75%;"></div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Student Attendance List
+                </div>
+                <div class="student-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-attendance-list">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="close-view-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const classSessions = [
+            { id: 1, course: "CS101: Introduction to Programming", date: "2023-05-15", startTime: "09:00", endTime: "10:30", room: "Room 101", expectedStudents: 40, presentStudents: 35 },
+            { id: 2, course: "CS202: Data Structures", date: "2023-05-16", startTime: "13:00", endTime: "14:30", room: "Room 203", expectedStudents: 35, presentStudents: 30 },
+            { id: 3, course: "CS305: Algorithm Design", date: "2023-05-17", startTime: "10:00", endTime: "11:30", room: "Room 105", expectedStudents: 25, presentStudents: 22 },
+            { id: 4, course: "CS101: Introduction to Programming", date: "2023-05-18", startTime: "09:00", endTime: "10:30", room: "Room 101", expectedStudents: 40, presentStudents: 38 },
+            { id: 5, course: "CS202: Data Structures", date: "2023-05-19", startTime: "13:00", endTime: "14:30", room: "Room 203", expectedStudents: 35, presentStudents: 28 }
+        ];
+
+        const attendanceRecords = [
+            { studentId: "S1001", studentName: "John Smith", course: "CS101: Introduction to Programming", date: "2023-05-15", status: "Present" },
+            { studentId: "S1002", studentName: "Emily Johnson", course: "CS101: Introduction to Programming", date: "2023-05-15", status: "Present" },
+            { studentId: "S1003", studentName: "Michael Brown", course: "CS101: Introduction to Programming", date: "2023-05-15", status: "Absent" },
+            { studentId: "S1004", studentName: "Jessica Davis", course: "CS101: Introduction to Programming", date: "2023-05-15", status: "Present" },
+            { studentId: "S1005", studentName: "David Wilson", course: "CS101: Introduction to Programming", date: "2023-05-15", status: "Present" },
+            { studentId: "S1001", studentName: "John Smith", course: "CS202: Data Structures", date: "2023-05-16", status: "Present" },
+            { studentId: "S1002", studentName: "Emily Johnson", course: "CS202: Data Structures", date: "2023-05-16", status: "Absent" },
+            { studentId: "S1006", studentName: "Sarah Miller", course: "CS202: Data Structures", date: "2023-05-16", status: "Present" },
+            { studentId: "S1007", studentName: "James Taylor", course: "CS202: Data Structures", date: "2023-05-16", status: "Present" },
+            { studentId: "S1008", studentName: "Olivia Anderson", course: "CS305: Algorithm Design", date: "2023-05-17", status: "Present" },
+            { studentId: "S1009", studentName: "Daniel Thomas", course: "CS305: Algorithm Design", date: "2023-05-17", status: "Present" },
+            { studentId: "S1010", studentName: "Sophia Martinez", course: "CS305: Algorithm Design", date: "2023-05-17", status: "Absent" }
+        ];
+
+        // DOM Elements
+        const addSessionBtn = document.getElementById('add-session-btn');
+        const addSessionModal = document.getElementById('add-session-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveSessionBtn = document.getElementById('save-session-btn');
+        const sessionsTableBody = document.getElementById('sessions-table-body');
+        const viewSessionModal = document.getElementById('view-session-modal');
+        const closeViewModalBtn = document.getElementById('close-view-modal-btn');
+        const closeViewBtn = document.getElementById('close-view-btn');
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+        const courseFilter = document.getElementById('course-filter');
+        const attendanceTableBody = document.getElementById('attendance-table-body');
+        const totalSessionsElement = document.getElementById('total-sessions');
+        const attendanceChart = document.getElementById('attendance-chart');
+
+        // Initialize the dashboard
+        function initDashboard() {
+            renderClassSessions();
+            renderAttendanceRecords();
+            initAttendanceChart();
+            updateTotalSessions();
+        }
+
+        // Render class sessions table
+        function renderClassSessions() {
+            sessionsTableBody.innerHTML = '';
+
+            classSessions.forEach(session => {
+                const attendancePercentage = Math.round((session.presentStudents / session.expectedStudents) * 100);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.course}</td>
+                    <td>${formatDate(session.date)}</td>
+                    <td>${session.startTime} - ${session.endTime}</td>
+                    <td>
+                        <div class="progress-wrapper">
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${attendancePercentage}%"></div>
+                            </div>
+                            <span class="progress-text">${attendancePercentage}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <a class="action-link view-session-btn" data-id="${session.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            View
+                        </a>
+                    </td>
+                `;
+                sessionsTableBody.appendChild(row);
+            });
+
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-session-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const sessionId = parseInt(this.getAttribute('data-id'));
+                    openViewSessionModal(sessionId);
+                });
+            });
+        }
+
+        // Render attendance records table
+        function renderAttendanceRecords(filter = 'all') {
+            attendanceTableBody.innerHTML = '';
+
+            let filteredRecords = attendanceRecords;
+            if (filter !== 'all') {
+                filteredRecords = attendanceRecords.filter(record => {
+                    return record.course.toLowerCase().includes(filter.toLowerCase());
+                });
+            }
+
+            filteredRecords.forEach(record => {
+                const row = document.createElement('tr');
+                const statusClass = record.status === 'Present' ? 'badge-success' : 'badge-danger';
+
+                row.innerHTML = `
+                    <td>${record.studentId}</td>
+                    <td>${record.studentName}</td>
+                    <td>${record.course}</td>
+                    <td>${formatDate(record.date)}</td>
+                    <td><span class="badge ${statusClass}">${record.status}</span></td>
+                `;
+                attendanceTableBody.appendChild(row);
+            });
+        }
+
+        // Initialize attendance chart
+        function initAttendanceChart() {
+            attendanceChart.innerHTML = '';
+
+            // Extract course names and attendance percentages
+            const courses = [...new Set(classSessions.map(session => session.course.split(':')[0]))];
+            const attendanceData = courses.map(course => {
+                const courseSessions = classSessions.filter(session => session.course.includes(course));
+                const totalExpected = courseSessions.reduce((sum, session) => sum + session.expectedStudents, 0);
+                const totalPresent = courseSessions.reduce((sum, session) => sum + session.presentStudents, 0);
+                return Math.round((totalPresent / totalExpected) * 100);
+            });
+
+            // Create chart bars
+            const barWidth = 60;
+            const barGap = 40;
+            const totalWidth = courses.length * (barWidth + barGap) - barGap;
+            const startX = (attendanceChart.offsetWidth - totalWidth) / 2;
+
+            courses.forEach((course, index) => {
+                const percentage = attendanceData[index];
+                const barHeight = (percentage / 100) * 200; // Max height 200px
+
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = '0'; // Start at 0 for animation
+                bar.style.left = `${startX + index * (barWidth + barGap)}px`;
+                bar.style.width = `${barWidth}px`;
+
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = course;
+                label.style.left = `${startX + index * (barWidth + barGap)}px`;
+
+                attendanceChart.appendChild(bar);
+                attendanceChart.appendChild(label);
+
+                // Animate bar height
+                setTimeout(() => {
+                    bar.style.height = `${barHeight}px`;
+                }, 100 * index);
+            });
+        }
+
+        // Open view session modal
+        function openViewSessionModal(sessionId) {
+            const session = classSessions.find(s => s.id === sessionId);
+            if (!session) return;
+
+            document.getElementById('view-session-title').textContent = `Session Details: ${session.course}`;
+            document.getElementById('view-course').textContent = session.course;
+            document.getElementById('view-date').textContent = formatDate(session.date);
+            document.getElementById('view-time').textContent = `${session.startTime} - ${session.endTime}`;
+            document.getElementById('view-room').textContent = session.room;
+
+            const attendancePercentage = Math.round((session.presentStudents / session.expectedStudents) * 100);
+            document.getElementById('attendance-percentage').textContent = `${attendancePercentage}% (${session.presentStudents}/${session.expectedStudents} students)`;
+            document.getElementById('attendance-progress').style.width = `${attendancePercentage}%`;
+
+            // Populate student attendance list
+            const studentList = document.getElementById('student-attendance-list');
+            studentList.innerHTML = '';
+
+            // Filter attendance records for this session
+            const sessionRecords = attendanceRecords.filter(record =>
+                record.course === session.course && record.date === session.date
+            );
+
+            sessionRecords.forEach(record => {
+                const row = document.createElement('tr');
+                const statusClass = record.status === 'Present' ? 'badge-success' : 'badge-danger';
+
+                row.innerHTML = `
+                    <td>${record.studentId}</td>
+                    <td>${record.studentName}</td>
+                    <td><span class="badge ${statusClass}">${record.status}</span></td>
+                `;
+                studentList.appendChild(row);
+            });
+
+            viewSessionModal.classList.add('active');
+        }
+
+        // Update total sessions count
+        function updateTotalSessions() {
+            totalSessionsElement.textContent = classSessions.length;
+        }
+
+        // Format date to a more readable format
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Generate PDF function
+        function generatePDF() {
+            alert("PDF download functionality would be implemented here. In a real application, this would create and download a PDF of the attendance records.");
+        }
+
+        // Event Listeners
+        addSessionBtn.addEventListener('click', function () {
+            addSessionModal.classList.add('active');
+        });
+
+        closeModalBtn.addEventListener('click', function () {
+            addSessionModal.classList.remove('active');
+        });
+
+        cancelBtn.addEventListener('click', function () {
+            addSessionModal.classList.remove('active');
+        });
+
+        closeViewModalBtn.addEventListener('click', function () {
+            viewSessionModal.classList.remove('active');
+        });
+
+        closeViewBtn.addEventListener('click', function () {
+            viewSessionModal.classList.remove('active');
+        });
+
+        saveSessionBtn.addEventListener('click', function () {
+            const course = document.getElementById('course').value;
+            const date = document.getElementById('date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const room = document.getElementById('room').value;
+            const expectedStudents = parseInt(document.getElementById('expected-students').value);
+
+            if (!course || !date || !startTime || !endTime || !room || isNaN(expectedStudents)) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Create new session
+            const newSession = {
+                id: classSessions.length + 1,
+                course,
+                date,
+                startTime,
+                endTime,
+                room,
+                expectedStudents,
+                presentStudents: 0 // New session has no attendance yet
+            };
+
+            classSessions.unshift(newSession); // Add to beginning of array
+            renderClassSessions();
+            updateTotalSessions();
+            initAttendanceChart(); // Refresh chart
+            addSessionModal.classList.remove('active');
+
+            // Reset form
+            document.getElementById('add-session-form').reset();
+        });
+
+        courseFilter.addEventListener('change', function () {
+            renderAttendanceRecords(this.value);
+        });
+
+        downloadPdfBtn.addEventListener('click', function () {
+            generatePDF();
+        });
+
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+
+        // Handle window resize for chart
+        window.addEventListener('resize', function () {
+            initAttendanceChart();
+        });
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'940330c8371c3cf3',t:'MTc0NzMxNzkzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>

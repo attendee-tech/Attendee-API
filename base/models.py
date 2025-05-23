@@ -83,12 +83,18 @@ class Course(models.Model):
     
 class ClassSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lecturer = models.ForeignKey(User, on_delete=models.CASCADE)
-    duration_time = models.IntegerField()
+    lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
     
-    latitude=models.FloatField()
-    longitude=models.FloatField()
-    level=models.IntegerField()
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    
+    latitude=models.FloatField(default=1.0)
+    longitude=models.FloatField(default=1.0)
+    hall=models.CharField(blank=True, max_length=100)
+
+    def clean(self):
+        if self.start_time >= self.end_time:
+            raise ValidationError("End time must be afte start time")
     
     def __str__(self):
         return self.course.name + ' - ' + self.course.department.name + ' - ' + self.course.department.school.name
@@ -98,8 +104,8 @@ class ClassSession(models.Model):
     
 class Attendance(models.Model):
     is_present=models.BooleanField(default=False)
-    class_session = models.ForeignKey(ClassSession, on_delete=models.CASCADE)
-    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    class_session = models.ForeignKey(ClassSession, on_delete=models.CASCADE, related_name='attendances')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     attendance_time = models.DateTimeField(auto_now_add=True)
     
     

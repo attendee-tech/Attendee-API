@@ -71,8 +71,9 @@ class RegisterLecturerSerializer(serializers.Serializer):
 
 class ClassSessionSerializer(serializers.Serializer):
     course=serializers.CharField()
-    duration_time=serializers.IntegerField()
-    level=serializers.IntegerField()
+    start_time=serializers.DateTimeField()
+    end_time=serializers.DateTimeField()
+    hall=serializers.CharField()
     latitude=serializers.FloatField()
     longitude=serializers.FloatField()
    
@@ -88,17 +89,35 @@ class ClassSessionSerializer(serializers.Serializer):
         return data
         
     
-    
-
-class AttendanceSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Attendance
-        fields = '__all__'
-        
+        model=User
+        fields=['first_name','last_name', 'phone', 'email']
+
 class GetStudents(serializers.ModelSerializer):
+    user=UserSerializer()
     class Meta:
         model= Student
         fields='__all__'
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    student=GetStudents()
+    class Meta:
+        model = Attendance
+        fields = '__all__'
+
+class ClassSessionAttendanceSerializer(serializers.Serializer):
+    
+    course=serializers.CharField()
+    start_time=serializers.DateTimeField()
+    end_time=serializers.DateTimeField()
+    hall=serializers.CharField()
+    latitude=serializers.FloatField()
+    longitude=serializers.FloatField()
+    lecturer=serializers.CharField()
+    id=serializers.IntegerField()
+        
+
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)

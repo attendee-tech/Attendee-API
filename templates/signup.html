@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendee Portal Signup</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #6366f1;
+            --secondary: #0f172a;
+            --accent: #8b5cf6;
+            --accent-light: #a78bfa;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --background: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fd 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .signup-container {
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .signup-image {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .signup-image h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-image p {
+            font-size: 16px;
+            opacity: 0.9;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+            max-width: 400px;
+        }
+
+        .school-icon {
+            width: 120px;
+            height: 120px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .school-icon svg {
+            width: 70px;
+            height: 70px;
+            fill: white;
+        }
+
+        .signup-form {
+            flex: 1.2;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .signup-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .signup-header p {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-light);
+            position: relative;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .form-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .form-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-column {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            font-size: 16px;
+            color: var(--text-light);
+            pointer-events: none;
+            transition: var(--transition);
+            z-index: 1;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            background-color: var(--white);
+            transition: var(--transition);
+            color: var(--text-dark);
+            position: relative;
+            z-index: 0;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group input:not(:placeholder-shown),
+        .input-group select:not([value=""]) {
+            border-color: var(--primary-light);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-group input:focus+label,
+        .input-group select:focus+label,
+        .input-group input:not(:placeholder-shown)+label,
+        .input-group select:not([value=""])+label {
+            transform: translateY(-28px) translateX(-10px) scale(0.8);
+            color: var(--primary);
+            background-color: white;
+            padding: 0 8px;
+            z-index: 2;
+        }
+
+        .input-group input::placeholder {
+            color: transparent;
+        }
+
+        .password-group {
+            position: relative;
+        }
+
+        .password-strength {
+            height: 4px;
+            width: 100%;
+            background-color: var(--border);
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: var(--transition);
+        }
+
+        .signup-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 18px 24px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .signup-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .signup-button:hover::before {
+            left: 100%;
+        }
+
+        .signup-button:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .login-link a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .terms-checkbox input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: var(--primary);
+        }
+
+        .terms-checkbox label {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .terms-checkbox a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        img {
+            height: 100px;
+            width: 100px;
+            border-radius: 100px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 900px) {
+            .signup-container {
+                flex-direction: column;
+            }
+
+            .signup-image {
+                padding: 30px 20px;
+            }
+
+            .signup-form {
+                padding: 30px 20px;
+                max-height: none;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signup-container animate-in">
+        <div class="signup-image">
+            <div class="school-icon">
+                <img src="{% static 'Attendee logo.jpg' %}" alt="">
+            </div>
+            <h1>Attendee Portal</h1>
+            <p>One Click To Intergrity</p>
+        </div>
+
+        <div class="signup-form">
+            <div class="signup-header">
+                <h2>Create Account</h2>
+                <p>Please fill in your information to register</p>
+            </div>
+
+            <div class="tab-navigation">
+                <button id="studentSignupTab" class="tab-button active">Student</button>
+                <button id="lecturerSignupTab" class="tab-button">Lecturer</button>
+            </div>
+
+            <!-- Student Signup Form -->
+            <form method="POST" action="{% url 'create-student' %}" id="studentSignupForm" class="form-content active">
+                {% csrf_token %}
+
+
+                {% for message in messages %}
+                <p style="text-align: center; color:red">{{message}}</p>
+                {% endfor %}
+
+
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="text" id="studentFirstName" placeholder="First Name" name='first-name'
+                                required>
+                            <label for="studentFirstName">First Name</label>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="text" id="studentLastName" placeholder="Last Name" name='last-name' required>
+                            <label for="studentLastName">Last Name</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="studentUsername" placeholder="Username" name='username' required>
+                    <label for="studentUsername">Username</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="studentMatriculate" placeholder="Matriculation Number"
+                        name='matricule_number' required>
+                    <label for="studentMatriculate">Matriculation Number</label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="email" id="studentEmail" placeholder="Email Address" name='email' required>
+                            <label for="studentEmail">Email Address</label>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="number" id="studentPhone" placeholder="Phone Number" name='phone' required>
+                            <label for="studentPhone">Phone Number</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="input-group">
+                            <select id="studentSchool" name="school" required>
+                                <option value="" selected disabled></option>
+                                {% for school in schools %}
+                                <option value="{{school.id}}">{{school.name}}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="studentSchool">School</label>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="input-group">
+                            <select id="studentDepartment" name="department" required>
+
+
+
+                            </select>
+                            <label for="studentDepartment">Department</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="input-group password-group">
+                            <input type="password" id="studentPassword" placeholder="Password" name="password" required>
+                            <label for="studentPassword">Password</label>
+                            <div class="password-strength">
+                                <div class="password-strength-bar" id="studentPasswordStrength"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="password" id="studentConfirmPassword" placeholder="Confirm Password" required>
+                            <label for="studentConfirmPassword">Confirm Password</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="studentTerms" required>
+                    <label for="studentTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy
+                            Policy</a></label>
+                </div>
+
+                <button type="submit" class="signup-button" id="studentSignupButton">Create Student Account</button>
+
+                <div class="login-link">
+                    <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+                </div>
+            </form>
+
+            <!-- Lecturer Signup Form -->
+            <form method="POST" action="{% url 'create-lecturer'%}" id="lecturerSignupForm" class="form-content">
+                {% csrf_token %}
+                {% for message in messages %}
+                <p style="text-align: center; color:red">{{message}}</p>
+                {% endfor %}
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="text" id="lecturerFirstName" placeholder="First Name" name="first-name" required>
+                            <label for="lecturerFirstName">First Name</label>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="text" id="lecturerLastName" placeholder="Last Name" name="last-name" required>
+                            <label for="lecturerLastName">Last Name</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="lecturerUsername" placeholder="Username" name="username" required>
+                    <label for="lecturerUsername">Username</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="lecturerStaffId" placeholder="Staff ID" name="matricule_number" required>
+                    <label for="lecturerStaffId">Matriculation Number</label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="email" id="lecturerEmail" placeholder="Email Address" name="email" required>
+                            <label for="lecturerEmail">Email Address</label>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="tel" id="lecturerPhone" placeholder="Phone Number" name="phone" required>
+                            <label for="lecturerPhone">Phone Number</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="input-group password-group">
+                            <input type="password" id="lecturerPassword" placeholder="Password" name="password" required>
+                            <label for="lecturerPassword">Password</label>
+                            <div class="password-strength">
+                                <div class="password-strength-bar" id="lecturerPasswordStrength"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="input-group">
+                            <input type="password" id="lecturerConfirmPassword" placeholder="Confirm Password" required>
+                            <label for="lecturerConfirmPassword">Confirm Password</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="lecturerTerms" required>
+                    <label for="lecturerTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy
+                            Policy</a></label>
+                </div>
+
+                <button type="submit" class="signup-button" id="lecturerSignupButton">Create Lecturer Account</button>
+
+                <div class="login-link">
+                    <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const studentSignupTab = document.getElementById('studentSignupTab');
+        const lecturerSignupTab = document.getElementById('lecturerSignupTab');
+        const studentSignupForm = document.getElementById('studentSignupForm');
+        const lecturerSignupForm = document.getElementById('lecturerSignupForm');
+
+        studentSignupTab.addEventListener('click', function () {
+            studentSignupTab.classList.add('active');
+            lecturerSignupTab.classList.remove('active');
+            studentSignupForm.classList.add('active');
+            lecturerSignupForm.classList.remove('active');
+        });
+
+        lecturerSignupTab.addEventListener('click', function () {
+            lecturerSignupTab.classList.add('active');
+            studentSignupTab.classList.remove('active');
+            lecturerSignupForm.classList.add('active');
+            studentSignupForm.classList.remove('active');
+        });
+
+        // Password strength indicator
+        function updatePasswordStrength(password, strengthBar) {
+            let strength = 0;
+            if (password.length > 6) strength += 25;
+            if (password.match(/[A-Z]/)) strength += 25;
+            if (password.match(/[0-9]/)) strength += 25;
+            if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+
+            strengthBar.style.width = strength + '%';
+
+            if (strength <= 25) {
+                strengthBar.style.backgroundColor = '#ef4444';
+            } else if (strength <= 50) {
+                strengthBar.style.backgroundColor = '#f59e0b';
+            } else if (strength <= 75) {
+                strengthBar.style.backgroundColor = '#3b82f6';
+            } else {
+                strengthBar.style.backgroundColor = '#10b981';
+            }
+        }
+
+        document.getElementById('studentPassword').addEventListener('input', function () {
+            updatePasswordStrength(this.value, document.getElementById('studentPasswordStrength'));
+        });
+
+        document.getElementById('lecturerPassword').addEventListener('input', function () {
+            updatePasswordStrength(this.value, document.getElementById('lecturerPasswordStrength'));
+        });
+
+        // Form submission - Student
+        document.getElementById('studentSignupButton').addEventListener('click', function () {
+
+
+            const password = document.getElementById('studentPassword').value;
+            const confirmPassword = document.getElementById('studentConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (!document.getElementById('studentTerms').checked) {
+                alert('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
+
+            // Add pulse animation to signup button
+            this.classList.add('pulse');
+            const originalText = this.textContent;
+            this.textContent = 'Creating Account...';
+
+            // Simulate signup with delay
+            setTimeout(() => {
+                alert('Student account created successfully!');
+
+                // Reset form and button
+                this.classList.remove('pulse');
+                this.textContent = originalText;
+
+
+                document.getElementById('studentPasswordStrength').style.width = '0';
+
+
+                //window.location.href = "{% url 'create-student'%}";
+            }, 3000);
+        });
+
+        // Form submission - Lecturer
+        document.getElementById('lecturerSignupButton').addEventListener('click', function (e) {
+            
+
+            const password = document.getElementById('lecturerPassword').value;
+            const confirmPassword = document.getElementById('lecturerConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (!document.getElementById('lecturerTerms').checked) {
+                alert('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
+
+            // Add pulse animation to signup button
+            this.classList.add('pulse');
+            const originalText = this.textContent;
+            this.textContent = 'Creating Account...';
+
+            // Simulate signup with delay
+            setTimeout(() => {
+                alert('Lecturer account created successfully!');
+
+                // Reset form and button
+                this.classList.remove('pulse');
+                this.textContent = originalText;
+                document.getElementById('lecturerSignupForm').reset();
+                document.getElementById('lecturerPasswordStrength').style.width = '0';
+
+                // In a real application, you would redirect to login or dashboard here
+                // window.location.href = 'login.html';
+            }, 3000);
+        });
+
+        // Fix for select elements to work with floating labels
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', function () {
+                if (this.value) {
+                    this.setAttribute('value', '1');
+                } else {
+                    this.removeAttribute('value');
+                }
+            });
+        });
+
+        // Add focus effects for better UX
+        const inputElements = document.querySelectorAll('input, select');
+        inputElements.forEach(input => {
+            if (input.type !== 'checkbox') {
+                input.addEventListener('focus', function () {
+                    this.parentElement.style.transform = 'translateY(-3px)';
+                    this.parentElement.style.transition = 'transform 0.3s ease';
+                });
+
+                input.addEventListener('blur', function () {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+            }
+        });
+        document.getElementById('studentSchool').addEventListener('change', (event) => {
+            var schoolId = event.target.value;
+            if (schoolId) {
+                fetch(`{% url 'getdepartments' %}?school_id=${schoolId}`)
+                .then(response => response.json())
+                .then(data => {
+                    var departmentSelect = document.getElementById('studentDepartment');
+                    departmentSelect.innerHTML = '<option value="" selected disabled></option>';
+                    data.forEach(department => {
+                        var option = document.createElement('option');
+                        option.value = department.id;
+                        option.text = department.name;
+                        departmentSelect.appendChild(option)
+                        console.log(data)
+                    })
+                })
+            }
+            else {
+                var departmentSelect = document.getElementById('studentDepartment');
+                departmentSelect.innerHTML = '<option value="" selected disabled></option>';
+
+            }
+            console.log(schoolId)
+        })
+    </script>
+</body>
+
+</html>

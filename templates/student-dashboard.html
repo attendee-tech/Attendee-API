@@ -1,0 +1,1099 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Attendee</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            background-color: #4f46e5;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text {
+            margin-left: 12px;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .menu-items {
+            list-style: none;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #e0e7ff;
+        }
+
+        .menu-item.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .menu-item-icon {
+            margin-right: 12px;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-info {
+            margin-left: 12px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-id {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .sign-out-btn {
+            margin-top: 16px;
+            width: 100%;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            color: #4b5563;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .sign-out-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        .sign-out-icon {
+            margin-right: 8px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            margin-right: 16px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+
+        .divider {
+            width: 1px;
+            height: 24px;
+            background-color: #e5e7eb;
+            margin: 0 16px;
+        }
+
+        .current-date {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(to right, #4f46e5, #4338ca);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .welcome-text h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text p {
+            opacity: 0.9;
+        }
+
+        .mark-attendance-btn {
+            background-color: white;
+            color: #4f46e5;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .mark-attendance-btn:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .mark-attendance-icon {
+            margin-right: 8px;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 9999px;
+        }
+
+        .badge-green {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .card-value {
+            display: flex;
+            align-items: center;
+        }
+
+        .value {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .trend {
+            margin-left: 8px;
+            font-size: 14px;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+        }
+
+        .trend-icon {
+            margin-right: 2px;
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Course Attendance */
+        .attendance-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .attendance-progress {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .progress-green {
+            background-color: #10b981;
+        }
+
+        .progress-yellow {
+            background-color: #f59e0b;
+        }
+
+        .course-item {
+            margin-bottom: 20px;
+        }
+
+        .course-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .course-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .course-instructor {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .attendance-percent {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 12px 24px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 16px 24px;
+            font-size: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+
+        .status-present {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-absent {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* QR Code Scanner */
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qr-placeholder {
+            background-color: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            width: 100%;
+            max-width: 240px;
+        }
+
+        .qr-box {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            text-align: center;
+        }
+
+        .qr-icon {
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .qr-text {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .scan-btn {
+            width: 100%;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .scan-btn:hover {
+            background-color: #4338ca;
+        }
+
+        /* Upcoming Classes */
+        .class-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .class-cs {
+            background-color: #eef2ff;
+        }
+
+        .class-math {
+            background-color: #dbeafe;
+        }
+
+        .class-physics {
+            background-color: #d1fae5;
+        }
+
+        .class-icon {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            padding: 8px;
+            margin-right: 16px;
+        }
+
+        .class-icon-cs {
+            color: #4f46e5;
+        }
+
+        .class-icon-math {
+            color: #2563eb;
+        }
+
+        .class-icon-physics {
+            color: #059669;
+        }
+
+        .class-details h3 {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .class-details p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Notifications */
+        .notification-item {
+            border-left-width: 4px;
+            padding-left: 12px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        .notification-warning {
+            border-left-color: #ef4444;
+        }
+
+        .notification-info {
+            border-left-color: #4f46e5;
+        }
+
+        .notification-success {
+            border-left-color: #10b981;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .notification-message {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+         img{
+            height: 50px;
+            width: 50px;
+            border-radius: 50px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow: auto;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .main-content {
+                height: auto;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .welcome-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .mark-attendance-btn {
+                margin-top: 16px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{% static 'Attendee logo.jpg'%}" alt="">
+                </div>
+                <div class="logo-text">
+                    <h1>Attendee</h1>
+                    <p>Attendance System</p>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-content">
+            <div class="menu-section">
+                <h2 class="menu-title">Main Menu</h2>
+                <ul class="menu-items">
+                    <li class="menu-item active">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </span>
+                        Dashboard
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </span>
+                        My Courses
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </span>
+                        Schedule
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </span>
+                        Attendance Records
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </span>
+                        Notifications
+                    </li>
+                </ul>
+            </div>
+            <div class="menu-section">
+                <h2 class="menu-title">Support</h2>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </span>
+                        Help Center
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </span>
+                        Settings
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">{{name_abb}}</div>
+                <div class="user-info">
+                    <p class="user-name">{{request.user.first_name}} {{request.user.last_name}}</p>
+                    <p class="user-id">Student ID: {{student.matricule_number}}</p>
+                </div>
+            </div>
+            <button class="sign-out-btn" onclick="window.location.href='{% url 'logout' %}'">
+                <span class="sign-out-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </span>
+                Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">Student Dashboard</h1>
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="notification-badge"></span>
+                </button>
+                <div class="divider"></div>
+                <div class="current-date" id="current-date"></div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h2>Welcome back, {{request.user.first_name}}!</h2>
+                    <p>Track your attendance and stay on top of your classes.</p>
+                </div>
+                <button class="mark-attendance-btn" id="mark-attendance-btn">
+                    <span class="mark-attendance-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </span>
+                    Mark Attendance
+                </button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Overall Attendance</h3>
+                        <span class="badge badge-green" id="badge">{{attendance_review}}</span>
+                        
+                    </div>
+                    <div class="card-value">
+                        <div class="value" id="val">{{attendance_percentage| floatformat:1}}%</div>
+                        <div class="trend">
+                            <span class="trend-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg>
+                            </span>
+                            {{attendance_present}}%
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Classes Attended</h3>
+                        <span class="badge badge-blue">TOTAL</span>
+                    </div>
+                    <div class="card-value">
+                        <div class="value">{{attendance_present}}/{{attendance_count}}</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Courses Enrolled</h3>
+                    </div>
+                    <div class="card-value">
+                        <div class="value">5</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{student.department.school.name}}</h3>
+                    </div>
+                    <div>
+                        <div class="value" style="font-size: 20px;">{{student.department.name}}</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-top: 4px;">Student</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="two-column">
+                <!-- Left Column -->
+                <div>
+                    <!-- Course Attendance -->
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h2 style="font-size: 18px; font-weight: bold;">Course Attendance</h2>
+                            <button style="font-size: 14px; color: #4f46e5; font-weight: 500; background: none; border: none; cursor: pointer;">View All</button>
+                        </div>
+                        <div>
+                            
+                            {% for class_session in class_sessions  %}
+                                
+                            
+                                
+                            <div class="course-item">
+                                <div class="course-header">
+                                    <div>
+                                        <h3 class="course-name">{{class_session.course.name}}</h3>
+                                        <p class="course-instructor">Prof. {{class_session.lecturer.user.first_name}} {{class_session.lecturer.user.last_name}}</p>
+                                    </div>
+                                    <div class="attendance-percent">{{class_session.class_session_percentage| floatformat:2}}%</div>
+                                </div>
+                                <div class="attendance-bar">
+                                    <div class="attendance-progress progress-green" style="background-color:{{class_session.bar}}; width: {{class_session.class_session_percentage}}%;"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Attendance -->
+                    <div class="card">
+                        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 24px;">Recent Attendance</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Course</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Oct 16, 2023</td>
+                                        <td>Computer Science 101</td>
+                                        <td>10:30 AM</td>
+                                        <td><span class="status-badge status-present">Present</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oct 16, 2023</td>
+                                        <td>Mathematics 202</td>
+                                        <td>1:00 PM</td>
+                                        <td><span class="status-badge status-present">Present</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oct 15, 2023</td>
+                                        <td>Physics 101</td>
+                                        <td>9:00 AM</td>
+                                        <td><span class="status-badge status-present">Present</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oct 15, 2023</td>
+                                        <td>English Literature</td>
+                                        <td>2:30 PM</td>
+                                        <td><span class="status-badge status-present">Present</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oct 14, 2023</td>
+                                        <td>History 101</td>
+                                        <td>11:00 AM</td>
+                                        <td><span class="status-badge status-absent">Absent</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <!-- QR Code Scanner -->
+                    <div class="card" style="margin-bottom: 24px;">
+                        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px;">Quick Attendance</h2>
+                        <div class="qr-container">
+                            <div class="qr-placeholder">
+                                <div class="qr-box">
+                                    <div>
+                                        <div class="qr-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="3" y="3" width="5" height="5" rx="1"></rect>
+                                                <rect x="16" y="3" width="5" height="5" rx="1"></rect>
+                                                <rect x="3" y="16" width="5" height="5" rx="1"></rect>
+                                                <path d="M21 16h-3a2 2 0 0 0-2 2v3"></path>
+                                                <path d="M21 21v.01"></path>
+                                                <path d="M12 7v3a2 2 0 0 1-2 2H7"></path>
+                                                <path d="M3 12h.01"></path>
+                                                <path d="M12 3h.01"></path>
+                                                <path d="M12 16v.01"></path>
+                                                <path d="M16 12h1"></path>
+                                                <path d="M21 12v.01"></path>
+                                                <path d="M12 21v-1"></path>
+                                            </svg>
+                                        </div>
+                                        <p class="qr-text">Scan QR code to mark attendance</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="scan-btn" id="scan-qr-btn">Scan QR Code</button>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Classes -->
+                    <div class="card" style="margin-bottom: 24px;">
+                        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px;">Upcoming Classes</h2>
+                        <div>
+                            <div class="class-item class-cs">
+                                <div class="class-icon class-icon-cs">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                </div>
+                                <div class="class-details">
+                                    <h3>Computer Science</h3>
+                                    <p>Today, 2:30 PM • Room 302</p>
+                                </div>
+                            </div>
+                            <div class="class-item class-math">
+                                <div class="class-icon class-icon-math">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                                    </svg>
+                                </div>
+                                <div class="class-details">
+                                    <h3>Mathematics</h3>
+                                    <p>Today, 4:00 PM • Room 201</p>
+                                </div>
+                            </div>
+                            <div class="class-item class-physics">
+                                <div class="class-icon class-icon-physics">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    </svg>
+                                </div>
+                                <div class="class-details">
+                                    <h3>Physics Lab</h3>
+                                    <p>Tomorrow, 10:00 AM • Lab 105</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="card">
+                        <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 16px;">Notifications</h2>
+                        <div>
+                            <div class="notification-item notification-warning">
+                                <p class="notification-title">Attendance Warning</p>
+                                <p class="notification-message">Your attendance in Physics 101 is below 80%</p>
+                                <p class="notification-time">2 hours ago</p>
+                            </div>
+                            <div class="notification-item notification-info">
+                                <p class="notification-title">Class Rescheduled</p>
+                                <p class="notification-message">Mathematics class moved to Room 201</p>
+                                <p class="notification-time">Yesterday</p>
+                            </div>
+                            <div class="notification-item notification-success">
+                                <p class="notification-title">Perfect Attendance</p>
+                                <p class="notification-message">You've achieved 100% attendance in English Literature</p>
+                                <p class="notification-time">2 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current date display
+        function updateCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById('current-date').textContent = today.toLocaleDateString('en-US', options);
+        }
+        updateCurrentDate();
+
+        // Menu item click handler
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                menuItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Mark attendance button
+        document.getElementById('mark-attendance-btn').addEventListener('click', function() {
+            alert('Opening attendance options...');
+        });
+
+        // Scan QR code button
+        document.getElementById('scan-qr-btn').addEventListener('click', function() {
+            alert('Opening camera to scan QR code...');
+        });
+
+        // Sign out button
+        document.querySelector('.sign-out-btn').addEventListener('click', function() {
+            
+        });
+
+        // Notification button
+        document.querySelector('.notification-btn').addEventListener('click', function() {
+            alert('Opening notifications...');
+        });
+
+        // Card hover effect
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94034da067ee55f3',t:'MTc0NzMxOTExMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,1213 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile | Attendee</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            background-color: #4f46e5;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text {
+            margin-left: 12px;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .menu-items {
+            list-style: none;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #e0e7ff;
+        }
+
+        .menu-item.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .menu-item-icon {
+            margin-right: 12px;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-info {
+            margin-left: 12px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-id {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .sign-out-btn {
+            margin-top: 16px;
+            width: 100%;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            color: #4b5563;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .sign-out-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        .sign-out-icon {
+            margin-right: 8px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            margin-right: 16px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+
+        .divider {
+            width: 1px;
+            height: 24px;
+            background-color: #e5e7eb;
+            margin: 0 16px;
+        }
+
+        .current-date {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* Profile Page Styles */
+        .profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            margin-right: 24px;
+        }
+
+        .profile-info h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .profile-info p {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        .profile-status {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #10b981;
+            margin-right: 8px;
+        }
+
+        .edit-profile-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .edit-icon {
+            margin-right: 8px;
+        }
+
+        .profile-sections {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .profile-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .profile-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .profile-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .profile-card-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .detail-item {
+            margin-bottom: 16px;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .academic-info {
+            margin-bottom: 24px;
+        }
+
+        .academic-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .academic-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .academic-details {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .academic-details:last-child {
+            border-bottom: none;
+        }
+
+        .academic-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .academic-value {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+        }
+
+        .contact-details h3 {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .contact-details p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 14px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: #ffffff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .cancel-btn {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            margin-right: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        .save-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .save-btn:hover {
+            background-color: #4338ca;
+        }
+
+         img{
+            height: 50px;
+            width: 50px;
+            border-radius: 50px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow: auto;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .main-content {
+                height: auto;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .profile-header-left {
+                margin-bottom: 16px;
+            }
+
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="assets/Attendee logo.jpg" alt="attendee logo">
+                </div>
+                <div class="logo-text">
+                    <h1>Attendee</h1>
+                    <p>Attendance System</p>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-content">
+            <div class="menu-section">
+                <h2 class="menu-title">Main Menu</h2>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </span>
+                        Dashboard
+                    </li>
+                    <li class="menu-item active">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </span>
+                        My Profile
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </span>
+                        My Courses
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </span>
+                        Schedule
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </span>
+                        Attendance Records
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </span>
+                        Notifications
+                    </li>
+                </ul>
+            </div>
+            <div class="menu-section">
+                <h2 class="menu-title">Support</h2>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </span>
+                        Help Center
+                    </li>
+                    <li class="menu-item">
+                        <span class="menu-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </span>
+                        Settings
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">AJ</div>
+                <div class="user-info">
+                    <p class="user-name">Alex Johnson</p>
+                    <p class="user-id">Student ID: S12345</p>
+                </div>
+            </div>
+            <button class="sign-out-btn">
+                <span class="sign-out-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </span>
+                Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">My Profile</h1>
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="notification-badge"></span>
+                </button>
+                <div class="divider"></div>
+                <div class="current-date" id="current-date">Monday, October 16, 2023</div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="content">
+            <div class="profile-container">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-header-left">
+                        <div class="profile-avatar">AJ</div>
+                        <div class="profile-info">
+                            <h1>Alex Johnson</h1>
+                            <p>Computer Science • Year 3</p>
+                            <div class="profile-status">
+                                <span class="status-indicator"></span>
+                                <span>Active Student</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="edit-profile-btn" id="edit-profile-btn">
+                        <span class="edit-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </span>
+                        Edit Profile
+                    </button>
+                </div>
+
+                <!-- Profile Sections -->
+                <div class="profile-sections">
+                    <!-- Left Column -->
+                    <div>
+                        <!-- Personal Information -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h2 class="profile-card-title">Personal Information</h2>
+                            </div>
+                            <div class="profile-details">
+                                <div class="detail-item">
+                                    <p class="detail-label">Full Name</p>
+                                    <p class="detail-value">Alex Johnson</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Student ID</p>
+                                    <p class="detail-value">S12345</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Date of Birth</p>
+                                    <p class="detail-value">May 15, 1999</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Gender</p>
+                                    <p class="detail-value">Male</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Email</p>
+                                    <p class="detail-value">alex.johnson@university.edu</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Phone</p>
+                                    <p class="detail-value">(555) 123-4567</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Address</p>
+                                    <p class="detail-value">123 University Ave, College Town, CT 12345</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Nationality</p>
+                                    <p class="detail-value">United States</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Information -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h2 class="profile-card-title">Academic Information</h2>
+                            </div>
+                            <div class="academic-info">
+                                <div class="academic-header">
+                                    <h3 class="academic-title">Program Details</h3>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Department</span>
+                                    <span class="academic-value">Computer Science</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Program</span>
+                                    <span class="academic-value">Bachelor of Science in Computer Science</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Year</span>
+                                    <span class="academic-value">3rd Year</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Enrollment Date</span>
+                                    <span class="academic-value">September 2021</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Expected Graduation</span>
+                                    <span class="academic-value">June 2025</span>
+                                </div>
+                            </div>
+                            <div class="academic-info">
+                                <div class="academic-header">
+                                    <h3 class="academic-title">Academic Performance</h3>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Current GPA</span>
+                                    <span class="academic-value">3.8/4.0</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Credits Completed</span>
+                                    <span class="academic-value">72/120</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Academic Standing</span>
+                                    <span class="academic-value">Good Standing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <!-- Contact Information -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h2 class="profile-card-title">Contact Information</h2>
+                            </div>
+                            <div>
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="contact-details">
+                                        <h3>Email Address</h3>
+                                        <p>alex.johnson@university.edu</p>
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="contact-details">
+                                        <h3>Phone Number</h3>
+                                        <p>(555) 123-4567</p>
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="contact-details">
+                                        <h3>Address</h3>
+                                        <p>123 University Ave, College Town, CT 12345</p>
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="contact-details">
+                                        <h3>Emergency Contact</h3>
+                                        <p>Sarah Johnson (Mother) - (555) 987-6543</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skills & Interests -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h2 class="profile-card-title">Skills & Interests</h2>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Technical Skills</h3>
+                                <div style="margin-bottom: 16px;">
+                                    <span class="skill-tag">Java</span>
+                                    <span class="skill-tag">Python</span>
+                                    <span class="skill-tag">JavaScript</span>
+                                    <span class="skill-tag">HTML/CSS</span>
+                                    <span class="skill-tag">SQL</span>
+                                    <span class="skill-tag">React</span>
+                                    <span class="skill-tag">Node.js</span>
+                                </div>
+                                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Interests</h3>
+                                <div>
+                                    <span class="skill-tag">Web Development</span>
+                                    <span class="skill-tag">Machine Learning</span>
+                                    <span class="skill-tag">Data Science</span>
+                                    <span class="skill-tag">Mobile Apps</span>
+                                    <span class="skill-tag">Cybersecurity</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h2 class="profile-card-title">Additional Information</h2>
+                            </div>
+                            <div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Student Status</span>
+                                    <span class="academic-value">Full-time</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Scholarship</span>
+                                    <span class="academic-value">Merit Scholarship (50%)</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Campus Residence</span>
+                                    <span class="academic-value">Off-campus</span>
+                                </div>
+                                <div class="academic-details">
+                                    <span class="academic-label">Clubs & Organizations</span>
+                                    <span class="academic-value">Coding Club, Chess Club</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="edit-profile-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Profile</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Personal Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="first-name">First Name</label>
+                            <input class="form-input" type="text" id="first-name" value="Alex">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="last-name">Last Name</label>
+                            <input class="form-input" type="text" id="last-name" value="Johnson">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="dob">Date of Birth</label>
+                            <input class="form-input" type="date" id="dob" value="1999-05-15">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="gender">Gender</label>
+                            <select class="form-input" id="gender">
+                                <option value="male" selected>Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="nationality">Nationality</label>
+                        <input class="form-input" type="text" id="nationality" value="United States">
+                    </div>
+
+                    <h3 style="font-size: 16px; font-weight: 600; margin: 24px 0 16px;">Contact Information</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input class="form-input" type="email" id="email" value="alex.johnson@university.edu">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number</label>
+                        <input class="form-input" type="tel" id="phone" value="(555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="address">Address</label>
+                        <input class="form-input" type="text" id="address" value="123 University Ave">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="city">City</label>
+                            <input class="form-input" type="text" id="city" value="College Town">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="state">State</label>
+                            <input class="form-input" type="text" id="state" value="CT">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="zip">Zip Code</label>
+                        <input class="form-input" type="text" id="zip" value="12345">
+                    </div>
+
+                    <h3 style="font-size: 16px; font-weight: 600; margin: 24px 0 16px;">Emergency Contact</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="emergency-name">Contact Name</label>
+                            <input class="form-input" type="text" id="emergency-name" value="Sarah Johnson">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="emergency-relation">Relationship</label>
+                            <input class="form-input" type="text" id="emergency-relation" value="Mother">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="emergency-phone">Contact Phone</label>
+                        <input class="form-input" type="tel" id="emergency-phone" value="(555) 987-6543">
+                    </div>
+
+                    <h3 style="font-size: 16px; font-weight: 600; margin: 24px 0 16px;">Skills & Interests</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="skills">Technical Skills (comma separated)</label>
+                        <input class="form-input" type="text" id="skills" value="Java, Python, JavaScript, HTML/CSS, SQL, React, Node.js">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="interests">Interests (comma separated)</label>
+                        <input class="form-input" type="text" id="interests" value="Web Development, Machine Learning, Data Science, Mobile Apps, Cybersecurity">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" id="cancel-btn">Cancel</button>
+                <button class="save-btn" id="save-btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current date display
+        function updateCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById('current-date').textContent = today.toLocaleDateString('en-US', options);
+        }
+        updateCurrentDate();
+
+        // Menu item click handler
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                menuItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('edit-profile-modal');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+
+        function openModal() {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        editProfileBtn.addEventListener('click', openModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Form submission
+        saveBtn.addEventListener('click', function() {
+            // Here you would typically handle form submission
+            // For this demo, we'll just show an alert and close the modal
+            alert('Profile updated successfully!');
+            closeModal();
+            
+            // Update profile information on the page
+            // This is just for demonstration purposes
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const fullName = `${firstName} ${lastName}`;
+            
+            document.querySelector('.profile-info h1').textContent = fullName;
+            document.querySelector('.user-name').textContent = fullName;
+            document.querySelector('.profile-avatar').textContent = firstName.charAt(0) + lastName.charAt(0);
+            document.querySelector('.user-avatar').textContent = firstName.charAt(0) + lastName.charAt(0);
+            
+            const email = document.getElementById('email').value;
+            document.querySelectorAll('.detail-value')[4].textContent = email;
+            document.querySelector('.contact-details p').textContent = email;
+            
+            const phone = document.getElementById('phone').value;
+            document.querySelectorAll('.detail-value')[5].textContent = phone;
+            document.querySelectorAll('.contact-details p')[1].textContent = phone;
+            
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            const zip = document.getElementById('zip').value;
+            const fullAddress = `${address}, ${city}, ${state} ${zip}`;
+            document.querySelectorAll('.detail-value')[6].textContent = fullAddress;
+            document.querySelectorAll('.contact-details p')[2].textContent = fullAddress;
+            
+            const emergencyName = document.getElementById('emergency-name').value;
+            const emergencyRelation = document.getElementById('emergency-relation').value;
+            const emergencyPhone = document.getElementById('emergency-phone').value;
+            document.querySelectorAll('.contact-details p')[3].textContent = `${emergencyName} (${emergencyRelation}) - ${emergencyPhone}`;
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Sign out button
+        document.querySelector('.sign-out-btn').addEventListener('click', function() {
+            alert('Signing out...');
+        });
+
+        // Notification button
+        document.querySelector('.notification-btn').addEventListener('click', function() {
+            alert('Opening notifications...');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'940359d90432eeab',t:'MTc0NzMxOTYxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
