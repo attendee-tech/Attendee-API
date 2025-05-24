@@ -394,9 +394,13 @@ class GetClassSession(APIView):
             context = {
                 'course': class_session.course.name,
                 'id': class_session.id,
-                'duration':class_session.duration_time,
+                'duration':class_session.start_time,
                 'lecturer': f"{class_session.lecturer.user.first_name} {class_session.lecturer.user.last_name}",
-                'level': class_session.level,
+                'hall': class_session.hall,
+                'latitude': class_session.latitude,
+                'longitude': class_session.longitude,
+                'range_radius': class_session.range_radius
+                
             }
             return Response({'data': [context]}, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
