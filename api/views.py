@@ -227,7 +227,7 @@ class LecturerRegisterView(APIView):
 
 
 # User authentication
-    class LoginView(APIView):
+class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
