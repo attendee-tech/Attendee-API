@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-31x@*$32+j+@rrapvhl72r5v4eqwy@ocg+luo(+kanyc%-6p20'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['attendee-api.onrender.com', '127.0.0.1', 'attendee-api.vercel.com']
 
