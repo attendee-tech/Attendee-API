@@ -125,3 +125,5 @@ class ClassSessionAttendanceSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
+    device_id = serializers.CharField(max_length=255)
+
