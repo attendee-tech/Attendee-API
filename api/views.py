@@ -227,19 +227,32 @@ class LecturerRegisterView(APIView):
 
 
 # User authentication
-
-
-class LoginView(APIView):
+    class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
+            username = serializer.validated_data["username"]
+            password = serializer.validated_data["password"]
+            device_id = serializer.validated_data.get("device_id")
+
+            if not device_id:
+                return Response({"error": "Device ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
             try:
-                User.objects.get(username=serializer.validated_data["username"])
-            except:
-                return Response({"error": "User does not exists"}, status=status.HTTP_401_UNAUTHORIZED)
-            user = authenticate(username=serializer.validated_data["username"], password=serializer.validated_data["password"])
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return Response({"error": "User does not exist."}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Check if device_id matches
+            if user.device_id != device_id:
+                return Response({
+                    "error": "Login denied: This account is registered on a different device.",
+                    "note": "Contact admin or go through verification to reset your device."
+                }, status=status.HTTP_403_FORBIDDEN)
+
+            user = authenticate(username=username, password=password)
             if user:
                 tokens = generate_tokens(user)
                 login(request, user)
@@ -247,9 +260,10 @@ class LoginView(APIView):
                     {"message": "Logged in successfully", "tokens": tokens},
                     status=status.HTTP_200_OK,
                 )
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
