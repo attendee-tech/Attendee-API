@@ -2,12 +2,6 @@ from django.apps import AppConfig
 from django.contrib.auth import get_user_model
 import logging
 
-class BaseConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'base'
-    
-
-
 logger = logging.getLogger(__name__)
 
 def create_default_superuser():
@@ -22,8 +16,8 @@ def create_default_superuser():
     else:
         logger.info(f"Superuser '{username}' already exists.")
 
-class YourAppConfig(AppConfig):
-    name = 'yourapp'
-
+class BaseConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'base'
     def ready(self):
         create_default_superuser()
