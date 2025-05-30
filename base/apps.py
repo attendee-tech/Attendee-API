@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 def create_default_superuser():
     User = get_user_model()
-    username = 'admin'
+    username = 'rahim'
     email = 'admin@example.com'
-    password = 'your-strong-password'
+    password = 'admin.06'
 
     if not User.objects.filter(username=username).exists():
         User.objects.create_superuser(username, email, password)
