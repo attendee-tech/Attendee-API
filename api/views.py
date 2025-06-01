@@ -11,8 +11,6 @@ from .serilizers import (
     LoginSerializer,
     ClassSessionAttendanceSerializer
 )
-
-from rest_framework.pagination import PageNumberPagination
 from base.models import User, Student, Lecturer, Schools, Department, Course, ClassSession, Attendance
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -21,8 +19,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import Count, Q, F, FloatField, ExpressionWrapper, Case, When, Sum, Avg
 from datetime import datetime
-import math
-from django.utils import timezone
 
 
 
@@ -494,9 +490,45 @@ class LecturerClassSessionUpdateView(APIView):
         except ObjectDoesNotExist:
             return Response({'error': 'course or class session does not found'}, status=status.HTTP_404_NOT_FOUND)
         
+class GetClassSession(APIView):
+    def get(self, request, pk):
+        try:
+            class_session = ClassSession.objects.get(id=pk)
+            context = {
+                'course': class_session.course.name,
+                'id': class_session.id,
+                'duration':class_session.duration_time,
+                'lecturer': f"{class_session.lecturer.user.first_name} {class_session.lecturer.user.last_name}",
+                'level': class_session.level,
+            }
+            return Response({'data': [context]}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({'error': 'Class session not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
+
+#Mark attendance of an ongoing class class session course
+# Fix Attendance marking
+class AttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        student_id = request.data.get('student_id')
+        try:
+            class_session = ClassSession.objects.get(id=pk)
+        except ClassSession.DoesNotExist:
+            return Response({"error": "Class session not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            student = student_id
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        attendance, created = Attendance.objects.get_or_create(class_session=class_session, student=student)
+        attendance.is_present = True  # Set attendance to present
+        attendance.save()
+        return Response({'message': 'Attendance marked successfully'})
 
         
 
