@@ -302,7 +302,7 @@ class StudentClassSessionView(APIView):
                     
                 })
                 
-            current_time=datetime.now()
+            current_time=timezone.now()
 
             
             class_sessions_mark=ClassSession.objects.filter(course__department=student.department, end_time__gte=current_time)
@@ -377,7 +377,7 @@ class AttendanceView(APIView):
             student=student,
             defaults={
                 'is_present': True,
-                'attendance_time': datetime.now()
+                'attendance_time': timezone.now()
             }
         )
         
