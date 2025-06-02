@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .serilizers import (
+from .serializers import (
     RegisterStudentSerializer,
     RegisterLecturerSerializer,
     ClassSessionSerializer,
@@ -19,7 +19,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import Count, Q, F, FloatField, ExpressionWrapper, Case, When, Sum, Avg
 from datetime import datetime
+from django.utils import timezone
 import math
+from rest_framework.pagination import PageNumberPagination
 
 
 
@@ -57,11 +59,11 @@ class SessionProximityCheckView(APIView):
             student_lat = float(request.data.get("student_latitude"))
             student_lon = float(request.data.get("student_longitude"))
         except (TypeError, ValueError):
-            return Response({"error": "Invalid or missing coordinates"}, status=400)
+            return Response({"error": "Invalid or missing coordinates"}, status=status.HTTP_400_BAD_REQUEST)
 
         session_id = request.data.get("session_id")
         if not session_id:
-            return Response({"error": "Missing session_id"}, status=400)
+            return Response({"error": "Missing session_id"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             session = ClassSession.objects.get(id=session_id)
@@ -103,7 +105,7 @@ class StudentRegisterView(APIView):
             email = serializer.validated_data["email"]
             phone = serializer.validated_data["phone"]
             matricule_number = serializer.validated_data["matricule_number"]
-            device_id = serializer.validated_data.get("device_id")
+            device_id = serializer.validated_data["device_id"]
 
             if not device_id:
                 return Response({"error": "Device ID is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -474,7 +476,7 @@ class LecturerClassSessionView(APIView):
                 )
 
             except Exception as e:
-                return Response({'error': str(e)}, status=400)
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -491,45 +493,12 @@ class LecturerClassSessionUpdateView(APIView):
         except ObjectDoesNotExist:
             return Response({'error': 'course or class session does not found'}, status=status.HTTP_404_NOT_FOUND)
         
-class GetClassSession(APIView):
-    def get(self, request, pk):
-        try:
-            class_session = ClassSession.objects.get(id=pk)
-            context = {
-                'course': class_session.course.name,
-                'id': class_session.id,
-                'duration':class_session.duration_time,
-                'lecturer': f"{class_session.lecturer.user.first_name} {class_session.lecturer.user.last_name}",
-                'level': class_session.level,
-            }
-            return Response({'data': [context]}, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response({'error': 'Class session not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
 
 #Mark attendance of an ongoing class class session course
 # Fix Attendance marking
-class AttendanceView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        student_id = request.data.get('student_id')
-        try:
-            class_session = ClassSession.objects.get(id=pk)
-        except ClassSession.DoesNotExist:
-            return Response({"error": "Class session not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        try:
-            student = student_id
-        except Student.DoesNotExist:
-            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        attendance, created = Attendance.objects.get_or_create(class_session=class_session, student=student)
-        attendance.is_present = True  # Set attendance to present
-        attendance.save()
-        return Response({'message': 'Attendance marked successfully'})
 
         
 
@@ -743,7 +712,7 @@ class UserActivityHistoryView(APIView):
                 {
                     "class_session": att.class_session.id,
                     "course": att.class_session.course.name,
-                    "date": att.class_session.duration_time,
+                    "date": att.attendance_time,
                     "status": "Present" if att.is_present else "Absent",
                 }
                 for att in attendance
