@@ -82,7 +82,7 @@ class SessionProximityCheckView(APIView):
             session.latitude, session.longitude, student_lat, student_lon
         )
 
-        access_granted = distance <= radius
+        access_granted = distance <= (radius + 5.0)
 
         return Response({
             "access_granted": access_granted,
